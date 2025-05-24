@@ -22,3 +22,12 @@ export const createUser = async (req: Request<{}, {}, IUser>, res: Response, nex
         next(error) // pasa el error al middleware centralizado
     }
 };
+
+export const getAllUsers = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+        const users = await userService.getAllUsers();
+        res.status(200).json({ success: true, size: users.length, data: users });
+    } catch (error) {
+        next(error)
+    }
+};

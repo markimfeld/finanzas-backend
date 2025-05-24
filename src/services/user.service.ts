@@ -36,4 +36,8 @@ export class UserService {
 
         return { access_token: token };
     }
+
+    async getAllUsers(): Promise<IUser[]> {
+        return await this.userRepository.findAll();
+    }
 }

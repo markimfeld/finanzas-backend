@@ -14,4 +14,8 @@ export class UserRepositoryMongo implements IUserRepository {
         const found = await UserModel.findOne({ email }).lean<IUser>().exec();
         return found ?? null;
     }
+
+    async findAll(): Promise<IUser[]> {
+        return await UserModel.find().lean();
+    }
 }
