@@ -1,10 +1,22 @@
-import mongoose from 'mongoose';
+import { Schema, model, Document } from 'mongoose';
 
-const userSchema = new mongoose.Schema({
-    name: String,
-    email: { type: String, unique: true },
-    passwordHash: String,
-    createdAt: { type: Date, default: Date.now }
-});
+/** DTO “plano” que usa todo tu dominio */
+export interface IUser {
+    name: string;
+    email: string;
+    passwordHash: string;
+}
 
-export default mongoose.model('User', userSchema);
+/** Documento que Mongoose guarda en la colección */
+export type UserDocument = IUser & Document;
+
+const userSchema = new Schema<UserDocument>(
+    {
+        name: { type: String, required: true },
+        email: { type: String, required: true, unique: true },
+        passwordHash: { type: String, required: true }
+    },
+    { timestamps: true }     // createdAt / updatedAt
+);
+
+export const UserModel = model<UserDocument>('User', userSchema);
