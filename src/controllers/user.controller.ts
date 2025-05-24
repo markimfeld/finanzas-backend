@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { userService } from '../services';
 import { IUser } from '../interfaces/repositories/user.repository.interface';
 import { BadRequestError, InternalServerError } from '../errors';
+import { UserDTO } from '../dtos/user.dto';
 
 
 export const createUser = async (req: Request<{}, {}, IUser>, res: Response, next: NextFunction): Promise<void> => {
@@ -26,7 +27,9 @@ export const createUser = async (req: Request<{}, {}, IUser>, res: Response, nex
 export const getAllUsers = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const users = await userService.getAllUsers();
-        res.status(200).json({ success: true, size: users.length, data: users });
+        const safeUsers = UserDTO.fromMany(users);
+
+        res.status(200).json({ success: true, size: safeUsers.length, data: safeUsers });
     } catch (error) {
         next(error)
     }
