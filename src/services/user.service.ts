@@ -1,6 +1,10 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { ConflictError } from '../errors';
+// errors
+import { BadRequestError, ConflictError } from '../errors';
+// errors messages
+import { ERROR_MESSAGES } from '../constants/messages';
+// repositories
 import { IUser, IUserRepository } from '../interfaces/repositories/user.repository.interface';
 
 export class UserService {
@@ -9,7 +13,7 @@ export class UserService {
     async registerUser(userData: IUser): Promise<IUser> {
         const existing = await this.userRepository.findByEmail(userData.email);
         if (existing) {
-            throw new ConflictError('Email already in use');
+            throw new ConflictError(ERROR_MESSAGES.USER.ALREADY_EXISTS);
         }
 
         // Hash password antes de guardar
@@ -20,12 +24,12 @@ export class UserService {
     async loginUser(email: string, password: string): Promise<{ access_token: string }> {
         const user = await this.userRepository.findByEmail(email);
         if (!user || !user.passwordHash) {
-            throw new Error('Invalid credentials');
+            throw new BadRequestError(ERROR_MESSAGES.USER.NOT_FOUND);
         }
 
         const isMatch = await bcrypt.compare(password, user.passwordHash);
         if (!isMatch) {
-            throw new Error('Invalid credentials');
+            throw new BadRequestError(ERROR_MESSAGES.AUTH.INVALID_CREDENTIALS);
         }
 
         const token = jwt.sign(

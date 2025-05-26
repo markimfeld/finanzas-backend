@@ -1,10 +1,10 @@
-export class HttpError extends Error {
-    statusCode: number;
+export abstract class HttpError extends Error {
+    abstract statusCode: number;
 
-    constructor(statusCode: number, message: string) {
+    constructor(message: string) {
         super(message);
-        this.statusCode = statusCode;
-        Object.setPrototypeOf(this, new.target.prototype); // Corrige el prototipo
+        Object.setPrototypeOf(this, HttpError.prototype);
         Error.captureStackTrace(this);
     }
+    abstract serializeErrors(): { message: string; field?: string }[];
 }

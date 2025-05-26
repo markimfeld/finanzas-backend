@@ -3,20 +3,29 @@ import { userService } from '../services';
 import { IUser } from '../interfaces/repositories/user.repository.interface';
 import { BadRequestError, InternalServerError } from '../errors';
 import { UserDTO } from '../dtos/user.dto';
+import { ERROR_MESSAGES, VALIDATION_MESSAGES } from '../constants/messages';
 
 
 export const createUser = async (req: Request<{}, {}, IUser>, res: Response, next: NextFunction): Promise<void> => {
     try {
 
-        const { name, email } = req.body;
-        if (!name || !email) {
-            throw new BadRequestError('Nombre y email son requeridos');
+        const { name, email, passwordHash } = req.body;
+        if (!name) {
+            throw new BadRequestError(VALIDATION_MESSAGES.USER.NAME_REQUIRED);
+        }
+
+        if (!email) {
+            throw new BadRequestError(VALIDATION_MESSAGES.USER.EMAIL_REQUIRED);
+        }
+
+        if(!passwordHash) {
+            throw new BadRequestError(VALIDATION_MESSAGES.USER.PASSWORD_REQUIRED);
         }
 
         const user = await userService.registerUser(req.body);
 
         if (user == null) {
-            throw new InternalServerError('No se creó el usuario.')
+            throw new InternalServerError(ERROR_MESSAGES.GENERAL.INTERNAL_SERVER);
         }
         res.status(201).json({ success: true, data: user, message: "Usuario creado correctamente." });
     } catch (error) {

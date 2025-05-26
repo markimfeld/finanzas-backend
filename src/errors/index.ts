@@ -1,37 +1,91 @@
-import { HttpError } from './HttpError';
+import { HttpError } from "./HttpError";
 
 export class BadRequestError extends HttpError {
-    constructor(message = 'Bad Request') {
-        super(400, message);
+    statusCode = 400;
+    constructor(
+        message: string,
+        public details?: { message: string; field?: string }[]
+    ) {
+        super(message);
+        Object.setPrototypeOf(this, BadRequestError.prototype);
+    }
+
+    serializeErrors() {
+        return this.details || [{ message: this.message }];
     }
 }
 
 export class UnauthorizedError extends HttpError {
-    constructor(message = 'Unauthorized') {
-        super(401, message);
+    statusCode = 401;
+    constructor(
+        message: string,
+        public details?: { message: string; field?: string }[]
+    ) {
+        super(message);
+        Object.setPrototypeOf(this, BadRequestError.prototype);
+    }
+
+    serializeErrors() {
+        return this.details || [{ message: this.message }];
     }
 }
 
 export class ForbiddenError extends HttpError {
-    constructor(message = 'Forbidden') {
-        super(403, message);
+    statusCode = 403;
+    constructor(
+        message: string,
+        public details?: { message: string; field?: string }[]
+    ) {
+        super(message);
+        Object.setPrototypeOf(this, BadRequestError.prototype);
+    }
+
+    serializeErrors() {
+        return this.details || [{ message: this.message }];
     }
 }
 
 export class NotFoundError extends HttpError {
-    constructor(message = 'Not Found') {
-        super(404, message);
+    statusCode = 404;
+    constructor(
+        message: string,
+        public details?: { message: string; field?: string }[]
+    ) {
+        super(message);
+        Object.setPrototypeOf(this, BadRequestError.prototype);
+    }
+
+    serializeErrors() {
+        return this.details || [{ message: this.message }];
     }
 }
 
 export class ConflictError extends HttpError {
-    constructor(message = 'Conflict') {
-        super(409, message);
+    statusCode = 409;
+    constructor(
+        message: string,
+        public details?: { message: string; field?: string }[]
+    ) {
+        super(message);
+        Object.setPrototypeOf(this, BadRequestError.prototype);
+    }
+
+    serializeErrors() {
+        return this.details || [{ message: this.message }];
     }
 }
 
 export class InternalServerError extends HttpError {
-    constructor(message = 'Internal Server Error') {
-        super(500, message);
+    statusCode = 500;
+    constructor(
+        message: string,
+        public details?: { message: string; field?: string }[]
+    ) {
+        super(message);
+        Object.setPrototypeOf(this, BadRequestError.prototype);
+    }
+
+    serializeErrors() {
+        return this.details || [{ message: this.message }];
     }
 }
