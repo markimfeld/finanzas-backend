@@ -10,7 +10,6 @@ export const validateZod = (schema: ZodSchema<any>) => (req: Request, res: Respo
       field: err.path.join('.'),
       message: err.message,
     }));
-	console.log(errors)
     throw new BadRequestError('Validation failed', errors);
   }
 

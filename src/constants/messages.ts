@@ -9,16 +9,16 @@ export const ERROR_MESSAGES = {
     TOKEN_INVALID: 'Invalid or expired token',
   },
   GENERAL: {
-	INTERNAL_SERVER: 'Something went wrong. Please try again later.'
+    INTERNAL_SERVER: 'Something went wrong. Please try again later.'
   }
 };
 
 export const VALIDATION_MESSAGES = {
-	USER: {
-		NAME_REQUIRED: 'Name is required.',
-		EMAIL_REQUIRED: 'Email is required.',
-		INVALID_EMAIL: 'Email format is invalid.',
-		PASSWORD_REQUIRED: 'Password is required.',
-		PASSWORD_TOO_SHORT: 'Password must be at least 8 characters.'
-	}
+  USER: {
+    NAME_REQUIRED: 'Name is required.',
+    EMAIL_REQUIRED: 'Email is required.',
+    INVALID_EMAIL: 'Email format is invalid.',
+    PASSWORD_REQUIRED: 'Password is required.',
+    PASSWORD_TOO_SHORT: 'Password must be at least 8 characters.'
+  }
 }
