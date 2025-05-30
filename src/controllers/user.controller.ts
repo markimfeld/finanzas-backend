@@ -1,20 +1,26 @@
 import { Request, Response, NextFunction } from 'express';
+// services
 import { userService } from '../services';
-import { IUser } from '../interfaces/repositories/user.repository.interface';
-import { BadRequestError, InternalServerError } from '../errors';
+// dtos
 import { UserDTO } from '../dtos/user.dto';
-import { ERROR_MESSAGES, VALIDATION_MESSAGES } from '../constants/messages';
+import { CreateUserDto } from '../dtos/createUser.dto';
+// messages
+import { MESSAGES } from '../constants/messages';
+// erros
+import { InternalServerError } from '../errors';
 
 
-export const createUser = async (req: Request<{}, {}, IUser>, res: Response, next: NextFunction): Promise<void> => {
+export const createUser = async (req: Request<{}, {}, CreateUserDto>, res: Response, next: NextFunction): Promise<void> => {
     try {
 
         const user = await userService.registerUser(req.body);
 
         if (user == null) {
-            throw new InternalServerError(ERROR_MESSAGES.GENERAL.INTERNAL_SERVER);
+            throw new InternalServerError(MESSAGES.ERROR.GENERAL.INTERNAL_SERVER);
         }
-        res.status(201).json({ success: true, data: user, message: "Usuario creado correctamente." });
+
+        const safeUser = UserDTO.from(user);
+        res.status(201).json({ success: true, data: safeUser, message: MESSAGES.SUCCESS.USER.CREATED });
     } catch (error) {
         next(error) // pasa el error al middleware centralizado
     }

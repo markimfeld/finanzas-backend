@@ -14,4 +14,8 @@ export class UserDTO {
     static fromMany(users: (IUser & { _id: any })[]): UserDTO[] {
         return users.map(user => new UserDTO(user));
     }
+
+    static from(user: IUser & { _id: any }): UserDTO {
+        return new UserDTO(user);
+    }
 }

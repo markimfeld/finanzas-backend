@@ -6,8 +6,8 @@ export class UserRepositoryMongo implements IUserRepository {
     async create(user: IUser): Promise<IUser> {
         const created: UserDocument = await UserModel.create(user);
         // convertimos el Document a un objeto plano (sin métodos de Mongoose)
-        const { name, email, passwordHash } = created.toObject();
-        return { name, email, passwordHash };
+        const { _id, name, email, passwordHash } = created.toObject();
+        return { _id, name, email, passwordHash };
     }
 
     async findByEmail(email: string): Promise<IUser | null> {
@@ -16,6 +16,6 @@ export class UserRepositoryMongo implements IUserRepository {
     }
 
     async findAll(): Promise<IUser[]> {
-        return await UserModel.find().lean();
+        return await UserModel.find().lean<IUser[]>();
     }
 }

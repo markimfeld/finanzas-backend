@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 // errors
 import { UnauthorizedError } from '../errors';
-import { ERROR_MESSAGES } from '../constants/messages';
+import { MESSAGES } from '../constants/messages';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'default_secret'; // Usá .env en producción
 
@@ -14,7 +14,7 @@ export const authMiddleware = (req: AuthRequest, res: Response, next: NextFuncti
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        throw new UnauthorizedError(ERROR_MESSAGES.AUTH.TOKEN_MISSING);
+        throw new UnauthorizedError(MESSAGES.ERROR.AUTH.TOKEN_MISSING);
     }
 
     const token = authHeader.split(' ')[1];
@@ -24,6 +24,6 @@ export const authMiddleware = (req: AuthRequest, res: Response, next: NextFuncti
         req.user = decoded;
         next();
     } catch (err) {
-        throw new UnauthorizedError(ERROR_MESSAGES.AUTH.TOKEN_INVALID);
+        throw new UnauthorizedError(MESSAGES.ERROR.AUTH.TOKEN_INVALID);
     }
 };

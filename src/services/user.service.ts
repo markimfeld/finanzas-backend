@@ -3,17 +3,19 @@ import jwt from 'jsonwebtoken';
 // errors
 import { BadRequestError, ConflictError } from '../errors';
 // errors messages
-import { ERROR_MESSAGES } from '../constants/messages';
+import { MESSAGES } from '../constants/messages';
 // repositories
 import { IUser, IUserRepository } from '../interfaces/repositories/user.repository.interface';
+// dtos
+import { CreateUserDto } from '../dtos/createUser.dto';
 
 export class UserService {
     constructor(private userRepository: IUserRepository) { }
 
-    async registerUser(userData: IUser): Promise<IUser> {
+    async registerUser(userData: CreateUserDto): Promise<IUser> {
         const existing = await this.userRepository.findByEmail(userData.email);
         if (existing) {
-            throw new ConflictError(ERROR_MESSAGES.USER.ALREADY_EXISTS);
+            throw new ConflictError(MESSAGES.ERROR.USER.ALREADY_EXISTS);
         }
 
         // Hash password antes de guardar
@@ -21,15 +23,15 @@ export class UserService {
         return await this.userRepository.create(userData);
     }
 
-    async loginUser(email: string, password: string): Promise<{ access_token: string }> {
+    async loginUser(email: string, password: string): Promise<{ user: IUser, token: string }> {
         const user = await this.userRepository.findByEmail(email);
         if (!user || !user.passwordHash) {
-            throw new BadRequestError(ERROR_MESSAGES.USER.NOT_FOUND);
+            throw new BadRequestError(MESSAGES.ERROR.USER.NOT_FOUND);
         }
 
         const isMatch = await bcrypt.compare(password, user.passwordHash);
         if (!isMatch) {
-            throw new BadRequestError(ERROR_MESSAGES.AUTH.INVALID_CREDENTIALS);
+            throw new BadRequestError(MESSAGES.ERROR.AUTH.INVALID_CREDENTIALS);
         }
 
         const token = jwt.sign(
@@ -38,7 +40,7 @@ export class UserService {
             { expiresIn: '7d' }
         );
 
-        return { access_token: token };
+        return { user, token };
     }
 
     async getAllUsers(): Promise<IUser[]> {
