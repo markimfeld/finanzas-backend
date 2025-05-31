@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 // errors
-import { BadRequestError, ConflictError } from '../errors';
+import { BadRequestError, ConflictError, NotFoundError } from '../errors';
 // errors messages
 import { MESSAGES } from '../constants/messages';
 // repositories
@@ -45,5 +45,21 @@ export class UserService {
 
     async getAllUsers(): Promise<IUser[]> {
         return await this.userRepository.findAll();
+    }
+
+    async getUserById(userId: string): Promise<IUser> {
+        const user = await this.userRepository.findById(userId);
+        if (!user) {
+            throw new NotFoundError(MESSAGES.ERROR.USER.NOT_FOUND);
+        }
+        return user;
+    }
+
+    async updateRefreshToken(userId: string, refreshToken: string): Promise<void> {
+        await this.userRepository.updateRefreshToken(userId, refreshToken);
+    }
+
+    async removeRefreshToken(userId: string): Promise<void> {
+        await this.userRepository.updateRefreshToken(userId, '');
     }
 }

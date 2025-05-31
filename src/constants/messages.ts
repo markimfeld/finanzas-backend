@@ -8,6 +8,8 @@ export const MESSAGES = {
       INVALID_CREDENTIALS: 'Invalid email or password',
       TOKEN_MISSING: 'Authorization token missing or malformed',
       TOKEN_INVALID: 'Invalid or expired token',
+      REFRESH_TOKEN_MISSING: 'Refresh token is missing.',
+      REFRESH_TOKEN_INVALID: 'Refresh token is invalid or expired.',
     },
     GENERAL: {
       INTERNAL_SERVER: 'Something went wrong. Please try again later.'

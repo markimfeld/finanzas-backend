@@ -5,6 +5,7 @@ export interface IUser {
     name: string;
     email: string;
     passwordHash: string;
+    refreshToken?: string;
 }
 
 /** Documento que Mongoose guarda en la colección */
@@ -14,7 +15,8 @@ const userSchema = new Schema<UserDocument>(
     {
         name: { type: String, required: true },
         email: { type: String, required: true, unique: true },
-        passwordHash: { type: String, required: true }
+        passwordHash: { type: String, required: true },
+        refreshToken: { type: String, default: null },
     },
     { timestamps: true }     // createdAt / updatedAt
 );
