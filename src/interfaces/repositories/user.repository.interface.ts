@@ -1,7 +1,7 @@
 import { CreateUserDto } from "../../dtos/createUser.dto";
 
 export interface IUser {
-    _id: string
+    _id: string;
     name: string;
     email: string;
     passwordHash: string;

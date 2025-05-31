@@ -1,12 +1,22 @@
-import { Request, Response, NextFunction } from 'express';
-import { userService } from '../services';
-import { AuthResponseDTO } from '../dtos/auth.dto';
-import { MESSAGES } from '../constants/messages';
-import { generateRefreshToken, generateAccessToken } from '../utils/token.util';
-import { UnauthorizedError } from '../errors';
-import jwt from 'jsonwebtoken';
+import { Request, Response, NextFunction } from "express";
+import jwt from "jsonwebtoken";
 
-export const login = async (req: Request, res: Response, next: NextFunction) => {
+// services
+import { userService } from "../services";
+// dto
+import { AuthResponseDTO } from "../dtos/auth.dto";
+// messages
+import { MESSAGES } from "../constants/messages";
+// utils
+import { generateRefreshToken, generateAccessToken } from "../utils/token.util";
+// errors
+import { UnauthorizedError } from "../errors";
+
+export const login = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
     try {
         const { email, password } = req.body;
         const { user, token } = await userService.loginUser(email, password);
@@ -14,44 +24,82 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
         const refreshToken = generateRefreshToken({ userId: user._id });
         await userService.updateRefreshToken(user._id, refreshToken);
 
-        res.status(200).json({ success: true, data: AuthResponseDTO.from(user, token), message: MESSAGES.SUCCESS.USER.LOGGED_IN });
+        user.refreshToken = refreshToken;
+
+        res.status(200).json({
+            success: true,
+            data: AuthResponseDTO.from(user, token),
+            message: MESSAGES.SUCCESS.USER.LOGGED_IN,
+        });
     } catch (err) {
         next(err);
     }
 };
 
-export const refreshAccessToken = async (req: Request, res: Response, next: NextFunction) => {
+export const refreshAccessToken = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
     try {
         const { refreshToken } = req.body;
 
-        if (!refreshToken) throw new UnauthorizedError(MESSAGES.ERROR.AUTH.REFRESH_TOKEN_MISSING);
+        if (!refreshToken)
+            throw new UnauthorizedError(
+                MESSAGES.ERROR.AUTH.REFRESH_TOKEN_MISSING
+            );
 
-        const payload = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET as string) as { userId: string };
+        const payload = jwt.verify(
+            refreshToken,
+            process.env.REFRESH_TOKEN_SECRET as string
+        ) as { userId: string };
 
         const user = await userService.getUserById(payload.userId);
 
         if (!user || user.refreshToken !== refreshToken) {
-            throw new UnauthorizedError(MESSAGES.ERROR.AUTH.REFRESH_TOKEN_INVALID);
+            throw new UnauthorizedError(
+                MESSAGES.ERROR.AUTH.REFRESH_TOKEN_INVALID
+            );
         }
 
         const newAccessToken = generateAccessToken({ userId: user._id });
 
-        res.json({ success: true, accessToken: newAccessToken });
+        res.json({
+            success: true,
+            data: AuthResponseDTO.from(user, newAccessToken),
+            message: MESSAGES.SUCCESS.USER.TOKEN_REFRESHED,
+        });
     } catch (error) {
         next(error);
     }
 };
 
-export const logout = async (req: Request, res: Response, next: NextFunction) => {
+export const logout = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+): Promise<void> => {
     try {
         const { refreshToken } = req.body;
-        if (!refreshToken) return res.sendStatus(204);
+        if (!refreshToken) res.sendStatus(204);
 
-        const payload = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET as string) as { userId: string };
+        const payload = jwt.verify(
+            refreshToken,
+            process.env.REFRESH_TOKEN_SECRET as string
+        ) as { userId: string };
+
+        const user = await userService.getUserById(payload.userId);
+
+        if (!user || user.refreshToken !== refreshToken) {
+            throw new UnauthorizedError(MESSAGES.ERROR.AUTH.ALREADY_LOGGED_OUT);
+        }
 
         await userService.removeRefreshToken(payload.userId);
 
-        res.status(200).json({ success: true, message: 'Logout exitoso' });
+        res.status(200).json({
+            success: true,
+            message: MESSAGES.SUCCESS.USER.LOGGED_OUT,
+        });
     } catch (error) {
         next(error);
     }

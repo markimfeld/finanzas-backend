@@ -1,5 +1,5 @@
-import { z } from 'zod';
-import { MESSAGES } from '../constants/messages';
+import { z } from "zod";
+import { MESSAGES } from "../constants/messages";
 
 export const loginSchema = z.object({
     email: z
