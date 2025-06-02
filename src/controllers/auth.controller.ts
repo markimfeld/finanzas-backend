@@ -11,6 +11,8 @@ import { MESSAGES } from "../constants/messages";
 import { generateRefreshToken, generateAccessToken } from "../utils/token.util";
 // errors
 import { UnauthorizedError } from "../errors";
+// interfaces
+import { JwtPayload } from "../interfaces/auth/jwtPayload.interface";
 
 export const login = async (
     req: Request,
@@ -52,7 +54,7 @@ export const refreshAccessToken = async (
         const payload = jwt.verify(
             refreshToken,
             process.env.REFRESH_TOKEN_SECRET as string
-        ) as { userId: string };
+        ) as JwtPayload;
 
         const user = await userService.getUserById(payload.userId);
 
@@ -86,7 +88,7 @@ export const logout = async (
         const payload = jwt.verify(
             refreshToken,
             process.env.REFRESH_TOKEN_SECRET as string
-        ) as { userId: string };
+        ) as JwtPayload;
 
         const user = await userService.getUserById(payload.userId);
 
