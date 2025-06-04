@@ -5,12 +5,14 @@ export class UserDTO {
     name: string;
     email: string;
     refreshToken: string;
+    role: string
 
     constructor(user: IUser & { _id: any }) {
         this.id = user._id.toString(); // Aseguramos que sea string
         this.name = user.name;
         this.email = user.email;
         this.refreshToken = user.refreshToken;
+        this.role = user.role;
     }
 
     static fromMany(users: (IUser & { _id: any })[]): UserDTO[] {

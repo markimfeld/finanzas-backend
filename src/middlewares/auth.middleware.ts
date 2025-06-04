@@ -3,11 +3,12 @@ import jwt from 'jsonwebtoken';
 // errors
 import { UnauthorizedError } from '../errors';
 import { MESSAGES } from '../constants/messages';
+import { JwtPayload } from '../interfaces/auth/jwtPayload.interface';
 
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET!;
 
 export interface AuthRequest extends Request {
-    user?: any; // Podés tipar con IUserPayload si tenés definido
+    user?: JwtPayload; // Podés tipar con IUserPayload si tenés definido
 }
 
 export const authMiddleware = (req: AuthRequest, res: Response, next: NextFunction) => {
@@ -20,7 +21,7 @@ export const authMiddleware = (req: AuthRequest, res: Response, next: NextFuncti
     const token = authHeader.split(' ')[1];
 
     try {
-        const decoded = jwt.verify(token, ACCESS_TOKEN_SECRET);
+        const decoded = jwt.verify(token, ACCESS_TOKEN_SECRET) as JwtPayload;
         req.user = decoded;
         next();
     } catch (err) {

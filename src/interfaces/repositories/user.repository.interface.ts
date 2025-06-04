@@ -6,6 +6,7 @@ export interface IUser {
     email: string;
     passwordHash: string;
     refreshToken: string;
+    role: string
 }
 
 export interface IUserRepository {

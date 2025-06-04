@@ -23,7 +23,7 @@ export const login = async (
         const { email, password } = req.body;
         const { user, access_token } = await userService.loginUser(email, password);
 
-        const refreshToken = generateRefreshToken({ userId: user._id });
+        const refreshToken = generateRefreshToken({ userId: user._id, role: user.role });
         await userService.updateRefreshToken(user._id, refreshToken);
 
         user.refreshToken = refreshToken;
@@ -64,7 +64,7 @@ export const refreshAccessToken = async (
             );
         }
 
-        const newAccessToken = generateAccessToken({ userId: user._id });
+        const newAccessToken = generateAccessToken({ userId: user._id, role: user.role });
 
         res.json({
             success: true,

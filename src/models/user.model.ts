@@ -6,6 +6,7 @@ export interface IUser {
     email: string;
     passwordHash: string;
     refreshToken?: string;
+    role: string
 }
 
 /** Documento que Mongoose guarda en la colección */
@@ -17,6 +18,11 @@ const userSchema = new Schema<UserDocument>(
         email: { type: String, required: true, unique: true },
         passwordHash: { type: String, required: true },
         refreshToken: { type: String, default: null },
+        role: {
+            type: String,
+            enum: ['admin', 'user', 'viewer'],
+            default: 'user'
+        }
     },
     { timestamps: true }     // createdAt / updatedAt
 );
