@@ -8,6 +8,7 @@ import { MESSAGES } from '../constants/messages';
 import { IUser, IUserRepository } from '../interfaces/repositories/user.repository.interface';
 // dtos
 import { CreateUserDto } from '../dtos/createUser.dto';
+import { generateAccessToken } from '../utils/token.util';
 
 export class UserService {
     constructor(private userRepository: IUserRepository) { }
@@ -23,7 +24,7 @@ export class UserService {
         return await this.userRepository.create(userData);
     }
 
-    async loginUser(email: string, password: string): Promise<{ user: IUser, token: string }> {
+    async loginUser(email: string, password: string): Promise<{ user: IUser, access_token: string }> {
         const user = await this.userRepository.findByEmail(email);
         if (!user || !user.passwordHash) {
             throw new BadRequestError(MESSAGES.ERROR.USER.NOT_FOUND);
@@ -34,13 +35,9 @@ export class UserService {
             throw new BadRequestError(MESSAGES.ERROR.AUTH.INVALID_CREDENTIALS);
         }
 
-        const token = jwt.sign(
-            { userId: user._id },
-            process.env.JWT_SECRET as string,
-            { expiresIn: '7d' }
-        );
+        const access_token = generateAccessToken({ userId: user._id });
 
-        return { user, token };
+        return { user, access_token };
     }
 
     async getAllUsers(): Promise<IUser[]> {

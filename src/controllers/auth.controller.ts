@@ -21,7 +21,7 @@ export const login = async (
 ) => {
     try {
         const { email, password } = req.body;
-        const { user, token } = await userService.loginUser(email, password);
+        const { user, access_token } = await userService.loginUser(email, password);
 
         const refreshToken = generateRefreshToken({ userId: user._id });
         await userService.updateRefreshToken(user._id, refreshToken);
@@ -30,7 +30,7 @@ export const login = async (
 
         res.status(200).json({
             success: true,
-            data: AuthResponseDTO.from(user, token),
+            data: AuthResponseDTO.from(user, access_token),
             message: MESSAGES.SUCCESS.USER.LOGGED_IN,
         });
     } catch (err) {
