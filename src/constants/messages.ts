@@ -28,8 +28,8 @@ export const MESSAGES = {
     SUCCESS: {
         USER: {
             CREATED: "User created successfully.",
-            LOGGED_IN: "Logged in successfully.",
-            LOGGED_OUT: "Logged out successfully.",
+            LOGGED_IN: "You have successfully logged in.",
+            LOGGED_OUT: "You have successfully logged out.",
             TOKEN_REFRESHED: "Access token renovated successfully.",
         },
     },
