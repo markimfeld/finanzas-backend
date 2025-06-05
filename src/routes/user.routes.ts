@@ -4,11 +4,10 @@ import { validateZod } from "../middlewares/validateZod";
 import { createUserSchema } from "../validations/user.schema";
 import { authMiddleware } from "../middlewares/auth.middleware";
 import { authorize } from "../middlewares/role.middleware";
-import { USER_ROLES } from "../interfaces/common/roles.interface";
 
 const router = express.Router();
 
-router.post("/", authMiddleware, authorize(USER_ROLES.USER), validateZod(createUserSchema), createUser);
-router.get("/", authMiddleware, authorize(USER_ROLES.ADMIN), getAllUsers);
+router.get("/", authMiddleware, authorize("users.read"), getAllUsers);
+router.post("/", validateZod(createUserSchema), createUser);
 
 export default router;

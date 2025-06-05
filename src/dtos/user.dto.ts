@@ -1,3 +1,4 @@
+import { IUserRole } from '../interfaces/common/roles.interface';
 import { IUser } from '../interfaces/repositories/user.repository.interface';
 
 export class UserDTO {
@@ -5,7 +6,7 @@ export class UserDTO {
     name: string;
     email: string;
     refreshToken: string;
-    role: string
+    role: IUserRole
 
     constructor(user: IUser & { _id: any }) {
         this.id = user._id.toString(); // Aseguramos que sea string

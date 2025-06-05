@@ -6,8 +6,8 @@ export class UserRepositoryMongo implements IUserRepository {
     async create(user: IUser): Promise<IUser> {
         const created: UserDocument = await UserModel.create(user);
         // convertimos el Document a un objeto plano (sin métodos de Mongoose)
-        const { _id, name, email, passwordHash, refreshToken } = created.toObject();
-        return { _id, name, email, passwordHash, refreshToken };
+        const { _id, name, email, passwordHash, refreshToken, role } = created.toObject();
+        return { _id, name, email, passwordHash, refreshToken, role };
     }
 
     async findByEmail(email: string): Promise<IUser | null> {

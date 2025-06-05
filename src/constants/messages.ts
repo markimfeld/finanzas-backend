@@ -14,6 +14,7 @@ export const MESSAGES = {
         },
         AUTHORIZATION: {
             FORBIDDEN: 'You do not have permission to access this resource.',
+            USER_NOT_AUTHENTICATED: 'Access denied. User not authenticated.'
         },
         GENERAL: {
             INTERNAL_SERVER: "Something went wrong. Please try again later.",

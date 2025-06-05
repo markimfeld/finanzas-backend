@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { MESSAGES } from "../constants/messages";
+import { USER_ROLES } from "../interfaces/common/roles.interface";
 
 export const createUserSchema = z.object({
     name: z
@@ -11,4 +12,5 @@ export const createUserSchema = z.object({
     passwordHash: z
         .string({ required_error: MESSAGES.VALIDATION.USER.PASSWORD_REQUIRED })
         .min(8, { message: MESSAGES.VALIDATION.USER.PASSWORD_TOO_SHORT }),
+    role: z.enum([USER_ROLES.ADMIN, USER_ROLES.USER, USER_ROLES.VIEWER]).optional().default(USER_ROLES.USER)
 });

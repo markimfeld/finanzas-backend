@@ -1,4 +1,5 @@
 import { CreateUserDto } from "../../dtos/createUser.dto";
+import { IUserRole } from "../common/roles.interface";
 
 export interface IUser {
     _id: string;
@@ -6,7 +7,7 @@ export interface IUser {
     email: string;
     passwordHash: string;
     refreshToken: string;
-    role: string
+    role: IUserRole
 }
 
 export interface IUserRepository {

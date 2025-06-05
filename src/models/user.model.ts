@@ -1,4 +1,5 @@
 import { Schema, model, Document } from 'mongoose';
+import { IUserRole } from '../interfaces/common/roles.interface';
 
 /** DTO “plano” que usa todo tu dominio */
 export interface IUser {
@@ -6,7 +7,7 @@ export interface IUser {
     email: string;
     passwordHash: string;
     refreshToken?: string;
-    role: string
+    role: IUserRole
 }
 
 /** Documento que Mongoose guarda en la colección */

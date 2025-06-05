@@ -25,6 +25,7 @@ export const createUser = async (
 
         // DTO
         const safeUser = UserDTO.from(user);
+        console.log(safeUser)
 
         res.status(201).json({
             success: true,
