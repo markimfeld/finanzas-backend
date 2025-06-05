@@ -12,6 +12,9 @@ export const MESSAGES = {
             REFRESH_TOKEN_INVALID: "Refresh token is invalid or expired.",
             ALREADY_LOGGED_OUT: "Already logged out.",
         },
+        AUTHORIZATION: {
+            FORBIDDEN: 'You do not have permission to access this resource.',
+        },
         GENERAL: {
             INTERNAL_SERVER: "Something went wrong. Please try again later.",
         },

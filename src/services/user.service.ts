@@ -9,6 +9,7 @@ import { IUser, IUserRepository } from '../interfaces/repositories/user.reposito
 // dtos
 import { CreateUserDto } from '../dtos/createUser.dto';
 import { generateAccessToken } from '../utils/token.util';
+import { IUserRole } from '../interfaces/common/roles.interface';
 
 export class UserService {
     constructor(private userRepository: IUserRepository) { }
@@ -35,7 +36,7 @@ export class UserService {
             throw new BadRequestError(MESSAGES.ERROR.AUTH.INVALID_CREDENTIALS);
         }
 
-        const access_token = generateAccessToken({ userId: user._id });
+        const access_token = generateAccessToken({ userId: user._id, role: user.role as IUserRole });
 
         return { user, access_token };
     }

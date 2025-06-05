@@ -13,6 +13,7 @@ import { generateRefreshToken, generateAccessToken } from "../utils/token.util";
 import { UnauthorizedError } from "../errors";
 // interfaces
 import { JwtPayload } from "../interfaces/auth/jwtPayload.interface";
+import { IUserRole } from "../interfaces/common/roles.interface";
 
 export const login = async (
     req: Request,
@@ -23,7 +24,7 @@ export const login = async (
         const { email, password } = req.body;
         const { user, access_token } = await userService.loginUser(email, password);
 
-        const refreshToken = generateRefreshToken({ userId: user._id, role: user.role });
+        const refreshToken = generateRefreshToken({ userId: user._id, role: user.role as IUserRole });
         await userService.updateRefreshToken(user._id, refreshToken);
 
         user.refreshToken = refreshToken;
@@ -64,7 +65,7 @@ export const refreshAccessToken = async (
             );
         }
 
-        const newAccessToken = generateAccessToken({ userId: user._id, role: user.role });
+        const newAccessToken = generateAccessToken({ userId: user._id, role: user.role as IUserRole });
 
         res.json({
             success: true,

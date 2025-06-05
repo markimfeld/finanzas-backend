@@ -8,7 +8,7 @@ import { USER_ROLES } from "../interfaces/common/roles.interface";
 
 const router = express.Router();
 
-router.post("/", validateZod(createUserSchema), createUser);
-router.get("/", authMiddleware, authorize(USER_ROLES.ADMIN), getAllUsers); // Ruta protegida
+router.post("/", authMiddleware, authorize(USER_ROLES.USER), validateZod(createUserSchema), createUser);
+router.get("/", authMiddleware, authorize(USER_ROLES.ADMIN), getAllUsers);
 
 export default router;
