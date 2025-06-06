@@ -12,5 +12,13 @@ export const createUserSchema = z.object({
     passwordHash: z
         .string({ required_error: MESSAGES.VALIDATION.USER.PASSWORD_REQUIRED })
         .min(8, { message: MESSAGES.VALIDATION.USER.PASSWORD_TOO_SHORT }),
-    role: z.enum([USER_ROLES.ADMIN, USER_ROLES.USER, USER_ROLES.VIEWER]).optional().default(USER_ROLES.USER)
+    role: z.enum([USER_ROLES.ADMIN, USER_ROLES.USER, USER_ROLES.VIEWER], { message: MESSAGES.VALIDATION.USER.INVALID_ROLE }).optional().default(USER_ROLES.USER)
+});
+
+export const updateUserSchema = z.object({
+    name: z.string()
+        .min(1, { message: MESSAGES.VALIDATION.USER.NAME_REQUIRED }).optional(),
+    email: z.string()
+        .email({ message: MESSAGES.VALIDATION.USER.INVALID_EMAIL }).optional(),
+    role: z.enum([USER_ROLES.ADMIN, USER_ROLES.USER, USER_ROLES.VIEWER], { message: MESSAGES.VALIDATION.USER.INVALID_ROLE }).optional(),
 });

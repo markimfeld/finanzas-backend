@@ -12,7 +12,7 @@ export const PERMISSIONS: Record<
     users: {
         create: [USER_ROLES.ADMIN],
         read: [USER_ROLES.ADMIN, USER_ROLES.USER],
-        update: [USER_ROLES.ADMIN],
+        update: [USER_ROLES.ADMIN, USER_ROLES.USER], // ⚠️ permitimos a USER, pero validamos en lógica de negocio
         delete: [USER_ROLES.ADMIN],
     }
 };

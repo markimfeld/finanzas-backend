@@ -1,5 +1,4 @@
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
 // errors
 import { BadRequestError, ConflictError, NotFoundError } from '../errors';
 // errors messages
@@ -8,7 +7,10 @@ import { MESSAGES } from '../constants/messages';
 import { IUser, IUserRepository } from '../interfaces/repositories/user.repository.interface';
 // dtos
 import { CreateUserDto } from '../dtos/createUser.dto';
+import { UpdateUserDto } from '../dtos/updateUser.dto';
+//utils
 import { generateAccessToken } from '../utils/token.util';
+// roles interface
 import { IUserRole } from '../interfaces/common/roles.interface';
 
 export class UserService {
@@ -59,5 +61,24 @@ export class UserService {
 
     async removeRefreshToken(userId: string): Promise<void> {
         await this.userRepository.updateRefreshToken(userId, '');
+    }
+
+    async updateUser(id: string, userData: UpdateUserDto): Promise<IUser> {
+
+        // validate that cannot edit email if the email provided is already in use.
+        if (userData.email) {
+            const existingUser = await this.userRepository.findByEmail(userData.email);
+            if (existingUser && existingUser._id !== id) {
+                throw new ConflictError(MESSAGES.ERROR.USER.ALREADY_EXISTS);
+            }
+        }
+
+        const user = await this.userRepository.updateUser(id, userData);
+
+        if (!user) {
+            throw new NotFoundError(MESSAGES.ERROR.USER.NOT_FOUND);
+        }
+
+        return user;
     }
 }

@@ -14,7 +14,8 @@ export const MESSAGES = {
         },
         AUTHORIZATION: {
             FORBIDDEN: 'You do not have permission to access this resource.',
-            USER_NOT_AUTHENTICATED: 'Access denied. User not authenticated.'
+            USER_NOT_AUTHENTICATED: 'Access denied. User not authenticated.',
+            CANNOT_CHANGE_ROLE: 'Only administrators can change the role.'
         },
         GENERAL: {
             INTERNAL_SERVER: "Something went wrong. Please try again later.",
@@ -27,11 +28,13 @@ export const MESSAGES = {
             INVALID_EMAIL: "Email format is invalid.",
             PASSWORD_REQUIRED: "Password is required.",
             PASSWORD_TOO_SHORT: "Password must be at least 8 characters.",
+            INVALID_ROLE: "Invalid role. Allowed roles are: admin, user, viewer.",
         },
     },
     SUCCESS: {
         USER: {
             CREATED: "User created successfully.",
+            UPDATED: "User updated successfully.",
             LOGGED_IN: "You have successfully logged in.",
             LOGGED_OUT: "You have successfully logged out.",
             TOKEN_REFRESHED: "Access token renovated successfully.",

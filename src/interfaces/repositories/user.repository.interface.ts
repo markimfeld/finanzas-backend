@@ -16,4 +16,5 @@ export interface IUserRepository {
     findById(userId: string): Promise<IUser | null>;
     findAll(): Promise<IUser[]>;
     updateRefreshToken(userId: string, refreshToken: string): Promise<void>;
+    updateUser(id: string, data: Partial<IUser>): Promise<IUser | null>;
 }

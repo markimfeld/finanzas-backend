@@ -4,10 +4,13 @@ import { userService } from "../services";
 // dtos
 import { UserDTO } from "../dtos/user.dto";
 import { CreateUserDto } from "../dtos/createUser.dto";
+import { UpdateUserDto } from "../dtos/updateUser.dto";
 // messages
 import { MESSAGES } from "../constants/messages";
 // erros
-import { InternalServerError } from "../errors";
+import { ForbiddenError, InternalServerError } from "../errors";
+import { USER_ROLES } from "../interfaces/common/roles.interface";
+
 
 export const createUser = async (
     req: Request<{}, {}, CreateUserDto>,
@@ -52,6 +55,42 @@ export const getAllUsers = async (
             success: true,
             size: safeUsers.length,
             data: safeUsers,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const updateUser = async (
+    req: Request<{ id: string }, {}, UpdateUserDto>,
+    res: Response,
+    next: NextFunction
+): Promise<void> => {
+    try {
+
+        const userIdToUpdate = req.params.id;
+        const authenticatedUser = req.user!; // ya está validado por authMiddleware
+
+        const isAdmin = authenticatedUser.role === USER_ROLES.ADMIN;
+        const isSelfUpdate = authenticatedUser.userId === userIdToUpdate;
+
+        // Si no es admin y quiere modificar a otro → error
+        if (!isAdmin && !isSelfUpdate) {
+            throw new ForbiddenError(MESSAGES.ERROR.AUTHORIZATION.FORBIDDEN);
+        }
+
+        // Solo el admin puede modificar el campo role
+        if (!isAdmin && req.body.role) {
+            throw new ForbiddenError(MESSAGES.ERROR.AUTHORIZATION.CANNOT_CHANGE_ROLE);
+        }
+
+        const updatedUser = await userService.updateUser(userIdToUpdate, req.body);
+        const safeUser = UserDTO.from(updatedUser);
+
+        res.status(200).json({
+            success: true,
+            data: safeUser,
+            message: MESSAGES.SUCCESS.USER.UPDATED,
         });
     } catch (error) {
         next(error);

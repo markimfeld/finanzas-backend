@@ -26,4 +26,8 @@ export class UserRepositoryMongo implements IUserRepository {
     async updateRefreshToken(userId: string, refreshToken: string): Promise<void> {
         await UserModel.findByIdAndUpdate(userId, { refreshToken });
     }
+
+    async updateUser(id: string, data: Partial<IUser>): Promise<IUser | null> {
+        return await UserModel.findByIdAndUpdate(id, data, { new: true });
+    }
 }
