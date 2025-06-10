@@ -65,14 +65,23 @@ export class UserService {
 
     async updateUser(id: string, userData: UpdateUserDto): Promise<IUser> {
 
-        // validate that cannot edit email if the email provided is already in use.
+        // Validar email solo si viene en el payload
         if (userData.email) {
-            const existingUser = await this.userRepository.findByEmail(userData.email);
-            if (existingUser && existingUser._id !== id) {
-                throw new ConflictError(MESSAGES.ERROR.USER.ALREADY_EXISTS);
+            const currentUser = await this.userRepository.findById(id);
+            if (!currentUser) {
+                throw new NotFoundError(MESSAGES.ERROR.USER.NOT_FOUND);
+            }
+
+            // Si el email cambió, validar que no esté en uso por otro usuario
+            if (userData.email !== currentUser.email) {
+                const existingUser = await this.userRepository.findByEmail(userData.email);
+                if (existingUser && existingUser._id.toString() !== id) {
+                    throw new ConflictError(MESSAGES.ERROR.USER.ALREADY_EXISTS);
+                }
             }
         }
 
+        // Actualizar usuario
         const user = await this.userRepository.updateUser(id, userData);
 
         if (!user) {
