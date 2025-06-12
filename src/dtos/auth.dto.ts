@@ -1,3 +1,7 @@
+/*
+* DTO de salida para evitar
+* exponer datos sensibles de AUTH
+*/
 import { IUser } from '../interfaces/repositories/user.repository.interface';
 import { UserDTO } from './user.dto';
 

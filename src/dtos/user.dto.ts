@@ -1,3 +1,7 @@
+/*
+* DTO de salida para evitar
+* exponer datos sensibles de USER
+*/
 import { IUserRole } from '../interfaces/common/roles.interface';
 import { IUser } from '../interfaces/repositories/user.repository.interface';
 

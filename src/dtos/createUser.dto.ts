@@ -1,3 +1,6 @@
+/*
+* DTO de entrada para crear usuario
+*/
 import { IUserRole } from "../interfaces/common/roles.interface";
 
 export interface CreateUserDto {
