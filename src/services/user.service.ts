@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 // errors
-import { BadRequestError, ConflictError, NotFoundError } from '../errors';
+import { BadRequestError, ConflictError, NotFoundError, UnauthorizedError } from '../errors';
 // errors messages
 import { MESSAGES } from '../constants/messages';
 // repositories
@@ -41,6 +41,21 @@ export class UserService {
         const access_token = generateAccessToken({ userId: user._id, role: user.role as IUserRole });
 
         return { user, access_token };
+    }
+
+    async changePassword(userId: string, currentPassword: string, newPassword: string): Promise<void> {
+        const user = await this.userRepository.findById(userId);
+        if (!user) {
+            throw new NotFoundError(MESSAGES.ERROR.USER.NOT_FOUND);
+        }
+
+        const isMatch = await bcrypt.compare(currentPassword, user.passwordHash);
+        if (!isMatch) {
+            throw new UnauthorizedError(MESSAGES.ERROR.AUTH.INCORRECT_CURRENT_PASSWORD);
+        }
+
+        const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+        await this.userRepository.updateUser(userId, { passwordHash: hashedNewPassword });
     }
 
     async getAllUsers(): Promise<IUser[]> {

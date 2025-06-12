@@ -107,3 +107,16 @@ export const logout = async (
         next(error);
     }
 };
+
+export const changePassword = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+        const { currentPassword, newPassword } = req.body;
+        const userId = req.user?.userId!;
+
+        await userService.changePassword(userId, currentPassword, newPassword);
+
+        res.status(200).json({ success: true, message: MESSAGES.SUCCESS.AUTH.PASSWORD_UPDATED });
+    } catch (error) {
+        next(error);
+    }
+};

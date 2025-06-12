@@ -11,6 +11,9 @@ export const MESSAGES = {
             REFRESH_TOKEN_MISSING: "Refresh token is missing.",
             REFRESH_TOKEN_INVALID: "Refresh token is invalid or expired.",
             ALREADY_LOGGED_OUT: "Already logged out.",
+            CURRENT_PASSWORD_REQUIRED: "Current password is required",
+            INCORRECT_CURRENT_PASSWORD: "Current password is incorrect",
+            PASSWORD_TOO_SHORT: "Password must be at least 8 characters",
         },
         AUTHORIZATION: {
             FORBIDDEN: 'You do not have permission to access this resource.',
@@ -39,5 +42,8 @@ export const MESSAGES = {
             LOGGED_OUT: "You have successfully logged out.",
             TOKEN_REFRESHED: "Access token renovated successfully.",
         },
+        AUTH: {
+            PASSWORD_UPDATED: "Password updated successfully",
+        }
     },
 };
