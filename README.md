@@ -39,3 +39,10 @@ Puede hacerse con middleware que loguea la actividad.
 
 - [ ] ⚙️ Actualizar configuración de perfil (avatar, bio, etc.)
 Si tu app tiene información adicional del usuario, podés permitir editar esos datos desde un endpoint de perfil.
+
+
+# 🧪 Otros detalles a considerar
+### Tests unitarios e integración (ideal para services y rutas críticas como login).
+### Rate limiting en login para evitar fuerza bruta.
+### Bloqueo de cuenta tras varios intentos fallidos (opcional, si buscás seguridad avanzada).
+### Verificación de email (si tu sistema lo requiere).
