@@ -14,28 +14,28 @@
 
 
 # 🧠 Sugerencias para completar/fortalecer módulo de usuarios:
-🔐 - [ ] Cambiar contraseña (Change Password)
+- [ ] 🔐 Cambiar contraseña (Change Password)
 Ruta protegida.
 Requiere contraseña actual + nueva.
 Solo el propio usuario puede hacerlo.
 Validar fuerza de la contraseña.
 
-📤 - [ ] Olvidé mi contraseña / Reset Password (opcional)
+- [ ] 📤 Olvidé mi contraseña / Reset Password (opcional)
 Envío de token temporal por email.
 Flujo de actualización de contraseña con token.
 Requiere integración con email, pero es muy común.
 
-👁️ - [ ] Get user by ID (detalles de usuario individual)
+- [ ] 👁️ Get user by ID (detalles de usuario individual)
 Permitido para uno mismo o admin.
 Útil si tenés un perfil de usuario detallado.
 
-🧼 - [ ] Soft delete / desactivar usuario (opcional)
+- [ ] 🧼 Soft delete / desactivar usuario (opcional)
 Marcar un usuario como inactivo en vez de borrarlo.
 Útil si no querés perder registros históricos.
 
-📊 - [ ] Auditoría (a futuro)
+- [ ] 📊 Auditoría (a futuro)
 Registrar qué usuario hizo qué acción (crear, editar, etc.).
 Puede hacerse con middleware que loguea la actividad.
 
-⚙️ - [ ] Actualizar configuración de perfil (avatar, bio, etc.)
+- [ ] ⚙️ Actualizar configuración de perfil (avatar, bio, etc.)
 Si tu app tiene información adicional del usuario, podés permitir editar esos datos desde un endpoint de perfil.
