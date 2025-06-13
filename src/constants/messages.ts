@@ -30,8 +30,9 @@ export const MESSAGES = {
             EMAIL_REQUIRED: "Email is required.",
             INVALID_EMAIL: "Email format is invalid.",
             PASSWORD_REQUIRED: "Password is required.",
-            PASSWORD_TOO_SHORT: "Password must be at least 8 characters.",
+            PASSWORD_TOO_SHORT: (min: number) => `Password must be at least ${min} characters`,
             INVALID_ROLE: "Invalid role. Allowed roles are: admin, user, viewer.",
+            PASSWORD_WEAK: "Password must include uppercase, lowercase, number, and special character."
         },
     },
     SUCCESS: {
