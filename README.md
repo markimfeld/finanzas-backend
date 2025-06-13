@@ -14,7 +14,7 @@
 
 
 # 🧠 Sugerencias para completar/fortalecer módulo de usuarios:
-- [ ] 🔐 Cambiar contraseña (Change Password)
+- [x] 🔐 Cambiar contraseña (Change Password)
 Ruta protegida.
 Requiere contraseña actual + nueva.
 Solo el propio usuario puede hacerlo.
