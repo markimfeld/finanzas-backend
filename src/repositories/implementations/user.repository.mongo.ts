@@ -6,8 +6,8 @@ export class UserRepositoryMongo implements IUserRepository {
     async create(user: IUser): Promise<IUser> {
         const created: UserDocument = await UserModel.create(user);
         // convertimos el Document a un objeto plano (sin métodos de Mongoose)
-        const { _id, name, email, passwordHash, refreshToken, role } = created.toObject();
-        return { _id, name, email, passwordHash, refreshToken, role };
+        const { _id, name, email, passwordHash, refreshToken, role, emailVerified, emailVerificationToken, emailVerificationTokenExpires } = created.toObject();
+        return { _id, name, email, passwordHash, refreshToken, role, emailVerified, emailVerificationToken, emailVerificationTokenExpires };
     }
 
     async findByEmail(email: string): Promise<IUser | null> {
@@ -29,5 +29,9 @@ export class UserRepositoryMongo implements IUserRepository {
 
     async updateUser(id: string, data: Partial<IUser>): Promise<IUser | null> {
         return await UserModel.findByIdAndUpdate(id, data, { new: true });
+    }
+
+    async findByVerificationToken(token: string): Promise<IUser | null> {
+        return await UserModel.findOne({ emailVerificationToken: token });
     }
 }

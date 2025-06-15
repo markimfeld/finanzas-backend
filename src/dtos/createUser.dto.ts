@@ -7,5 +7,8 @@ export interface CreateUserDto {
     name: string;
     email: string;
     passwordHash: string;
-    role?: IUserRole
+    role?: IUserRole;
+    emailVerified: boolean;
+    emailVerificationToken?: string
+    emailVerificationTokenExpires?: Date
 }

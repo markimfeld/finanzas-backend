@@ -4,6 +4,7 @@ import {
     login,
     logout,
     refreshAccessToken,
+    verifyEmail,
 } from "../controllers/auth.controller";
 import { validateZod } from "../middlewares/validateZod";
 import { loginSchema } from "../validations/auth.schema";
@@ -16,5 +17,6 @@ router.post("/login", validateZod(loginSchema), login);
 router.post("/change-password", authMiddleware, validateZod(changePasswordSchema), changePassword)
 router.post("/logout", authMiddleware, logout);
 router.post("/refresh-token", refreshAccessToken);
+router.get('/verify-email/:token', verifyEmail);
 
-export default router;
+export default router;  

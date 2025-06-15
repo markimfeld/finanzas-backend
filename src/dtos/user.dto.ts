@@ -10,7 +10,11 @@ export class UserDTO {
     name: string;
     email: string;
     refreshToken: string;
-    role: IUserRole
+    role: IUserRole;
+    emailVerified: boolean;
+    emailVerificationToken?: string;
+    emailVerificationTokenExpires?: Date;
+
 
     constructor(user: IUser & { _id: any }) {
         this.id = user._id.toString(); // Aseguramos que sea string
@@ -18,6 +22,9 @@ export class UserDTO {
         this.email = user.email;
         this.refreshToken = user.refreshToken;
         this.role = user.role;
+        this.emailVerified = user.emailVerified;
+        this.emailVerificationToken = user.emailVerificationToken;
+        this.emailVerificationTokenExpires = user.emailVerificationTokenExpires;
     }
 
     static fromMany(users: (IUser & { _id: any })[]): UserDTO[] {

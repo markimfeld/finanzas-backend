@@ -13,6 +13,9 @@ import { generateAccessToken } from '../utils/token.util';
 // roles interface
 import { IUserRole } from '../interfaces/common/roles.interface';
 
+import crypto from 'crypto';
+import { sendEmailVerification } from '../utils/email.util';
+
 export class UserService {
     constructor(private userRepository: IUserRepository) { }
 
@@ -22,9 +25,21 @@ export class UserService {
             throw new ConflictError(MESSAGES.ERROR.USER.ALREADY_EXISTS);
         }
 
+        const token = crypto.randomBytes(32).toString('hex');
+        const tokenExpires = new Date(Date.now() + 1000 * 60 * 60); // 1 hora
+
         // Hash password antes de guardar
         userData.passwordHash = await bcrypt.hash(userData.passwordHash, 10);
-        return await this.userRepository.create(userData);
+        const user = await this.userRepository.create({
+            ...userData,
+            emailVerified: false,
+            emailVerificationToken: token,
+            emailVerificationTokenExpires: tokenExpires
+        });
+
+        await sendEmailVerification(user.email, token);
+
+        return user;
     }
 
     async loginUser(email: string, password: string): Promise<{ user: IUser, access_token: string }> {
@@ -104,5 +119,22 @@ export class UserService {
         }
 
         return user;
+    }
+
+    async verifyEmailToken(token: string): Promise<IUser | null> {
+        const user = await this.userRepository.findByVerificationToken(token);
+
+        if (
+            !user ||
+            !user.emailVerificationTokenExpires ||
+            new Date(user.emailVerificationTokenExpires) < new Date()
+        ) {
+            return null;
+        }
+
+        user.emailVerified = true;
+        user.emailVerificationToken = '';
+        user.emailVerificationTokenExpires = new Date(Date.now() - 1000 * 60 * 60);
+        return await this.userRepository.updateUser(user._id, user);
     }
 }

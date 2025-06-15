@@ -10,7 +10,7 @@ import { MESSAGES } from "../constants/messages";
 // utils
 import { generateRefreshToken, generateAccessToken } from "../utils/token.util";
 // errors
-import { UnauthorizedError } from "../errors";
+import { BadRequestError, UnauthorizedError } from "../errors";
 // interfaces
 import { JwtPayload } from "../interfaces/auth/jwtPayload.interface";
 import { IUserRole } from "../interfaces/common/roles.interface";
@@ -116,6 +116,26 @@ export const changePassword = async (req: Request, res: Response, next: NextFunc
         await userService.changePassword(userId, currentPassword, newPassword);
 
         res.status(200).json({ success: true, message: MESSAGES.SUCCESS.AUTH.PASSWORD_UPDATED });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const verifyEmail = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const token = req.params.token;
+
+        if (!token || typeof token !== 'string') {
+            throw new BadRequestError(MESSAGES.ERROR.AUTH.INVALID_VERIFICATION_TOKEN);
+        }
+
+        const user = await userService.verifyEmailToken(token);
+
+        if (!user) {
+            throw new BadRequestError(MESSAGES.ERROR.AUTH.INVALID_VERIFICATION_TOKEN);
+        }
+
+        res.status(200).json({ success: true, message: MESSAGES.SUCCESS.AUTH.EMAIL_VERIFIED });
     } catch (error) {
         next(error);
     }

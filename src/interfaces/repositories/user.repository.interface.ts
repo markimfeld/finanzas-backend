@@ -7,7 +7,10 @@ export interface IUser {
     email: string;
     passwordHash: string;
     refreshToken: string;
-    role: IUserRole
+    role: IUserRole;
+    emailVerified: boolean;
+    emailVerificationToken?: string
+    emailVerificationTokenExpires?: Date
 }
 
 export interface IUserRepository {
@@ -17,4 +20,5 @@ export interface IUserRepository {
     findAll(): Promise<IUser[]>;
     updateRefreshToken(userId: string, refreshToken: string): Promise<void>;
     updateUser(id: string, data: Partial<IUser>): Promise<IUser | null>;
+    findByVerificationToken(token: string): Promise<IUser | null>;
 }

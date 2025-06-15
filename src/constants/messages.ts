@@ -14,6 +14,7 @@ export const MESSAGES = {
             CURRENT_PASSWORD_REQUIRED: "Current password is required",
             INCORRECT_CURRENT_PASSWORD: "Current password is incorrect",
             PASSWORD_TOO_SHORT: "Password must be at least 8 characters",
+            INVALID_VERIFICATION_TOKEN: "Invalid or expired verification token."
         },
         AUTHORIZATION: {
             FORBIDDEN: 'You do not have permission to access this resource.',
@@ -45,6 +46,7 @@ export const MESSAGES = {
         },
         AUTH: {
             PASSWORD_UPDATED: "Password updated successfully",
+            EMAIL_VERIFIED: "Email successfully verified."
         }
     },
 };
