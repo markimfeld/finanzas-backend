@@ -28,6 +28,7 @@
     "mongoose": "^8.14.3",
     "morgan": "^1.10.0",
     "nodemailer": "^7.0.3",
+    "resend": "^4.6.0",
     "zod": "^3.25.28"
   },
   "devDependencies": {
