@@ -53,6 +53,10 @@ export class UserService {
             throw new BadRequestError(MESSAGES.ERROR.AUTH.INVALID_CREDENTIALS);
         }
 
+        if (!user.emailVerified) {
+            throw new UnauthorizedError(MESSAGES.ERROR.AUTH.EMAIL_NOT_VERIFIED);
+        }
+
         const access_token = generateAccessToken({ userId: user._id, role: user.role as IUserRole });
 
         return { user, access_token };

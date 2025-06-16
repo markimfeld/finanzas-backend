@@ -15,7 +15,8 @@ export const MESSAGES = {
             INCORRECT_CURRENT_PASSWORD: "Current password is incorrect",
             PASSWORD_TOO_SHORT: "Password must be at least 8 characters",
             INVALID_VERIFICATION_TOKEN: "Invalid or expired verification token.",
-            SEND_FAILED: 'Failed to send email. Please try again later.'
+            SEND_FAILED: 'Failed to send email. Please try again later.',
+            EMAIL_NOT_VERIFIED: 'You must verify your email before logging in.'
         },
         AUTHORIZATION: {
             FORBIDDEN: 'You do not have permission to access this resource.',
