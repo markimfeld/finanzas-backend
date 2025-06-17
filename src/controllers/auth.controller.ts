@@ -140,3 +140,17 @@ export const verifyEmail = async (req: Request, res: Response, next: NextFunctio
         next(error);
     }
 };
+
+export const resendVerificationEmail = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { email } = req.body;
+
+        await userService.resendVerificationEmail(email);
+
+        res.status(200).json({
+            message: MESSAGES.SUCCESS.AUTH.VERIFICATION_EMAIL_RESENT
+        });
+    } catch (error) {
+        next(error);
+    }
+};

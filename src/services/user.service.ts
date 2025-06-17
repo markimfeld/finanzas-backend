@@ -141,4 +141,27 @@ export class UserService {
         user.emailVerificationTokenExpires = new Date(Date.now() - 1000 * 60 * 60);
         return await this.userRepository.updateUser(user._id, user);
     }
+
+    async resendVerificationEmail(email: string): Promise<IUser | null> {
+        const user = await this.userRepository.findByEmail(email);
+
+        if (!user) {
+            throw new NotFoundError(MESSAGES.ERROR.USER.NOT_FOUND);
+        }
+
+        if (user.emailVerified) {
+            throw new ConflictError(MESSAGES.ERROR.AUTH.ALREADY_VERIFIED);
+        }
+
+        const token = crypto.randomBytes(32).toString('hex');
+        const expires = new Date(Date.now() + 1000 * 60 * 60); // 1 hora
+
+        user.emailVerificationToken = token;
+        user.emailVerificationTokenExpires = expires;
+        await this.userRepository.updateUser(user._id, user);
+
+        await sendEmailVerification(user.email, token);
+
+        return user;
+    }
 }
