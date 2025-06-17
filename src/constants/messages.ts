@@ -16,7 +16,8 @@ export const MESSAGES = {
             PASSWORD_TOO_SHORT: "Password must be at least 8 characters",
             INVALID_VERIFICATION_TOKEN: "Invalid or expired verification token.",
             SEND_FAILED: 'Failed to send email. Please try again later.',
-            EMAIL_NOT_VERIFIED: 'You must verify your email before logging in.'
+            EMAIL_NOT_VERIFIED: 'You must verify your email before logging in.',
+            ALREADY_VERIFIED: 'This email is already verified.',
         },
         AUTHORIZATION: {
             FORBIDDEN: 'You do not have permission to access this resource.',
@@ -48,7 +49,8 @@ export const MESSAGES = {
         },
         AUTH: {
             PASSWORD_UPDATED: "Password updated successfully",
-            EMAIL_VERIFIED: "Email successfully verified."
+            EMAIL_VERIFIED: "Email successfully verified.",
+            VERIFICATION_EMAIL_RESENT: 'Verification email resent successfully.',
         }
     },
 };
