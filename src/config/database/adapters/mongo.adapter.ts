@@ -18,3 +18,8 @@ export const connectMongo = async () => {
         process.exit(1);
     }
 };
+
+export const disconnectMongo = async () => {
+    await mongoose.connection.close();
+    console.log('MongoDB disconnected');
+}
