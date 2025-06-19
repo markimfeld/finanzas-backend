@@ -1,4 +1,3 @@
-import bcrypt from 'bcrypt';
 // errors
 import { BadRequestError, ConflictError, NotFoundError, UnauthorizedError } from '../errors';
 // errors messages
@@ -10,11 +9,14 @@ import { CreateUserDto } from '../dtos/createUser.dto';
 import { UpdateUserDto } from '../dtos/updateUser.dto';
 //utils
 import { generateAccessToken } from '../utils/token.util';
+import { sendEmailVerification } from '../utils/email.util';
+import Hasher from '../utils/hash.util';
 // roles interface
 import { IUserRole } from '../interfaces/common/roles.interface';
 
 import crypto from 'crypto';
-import { sendEmailVerification } from '../utils/email.util';
+
+const hasher = Hasher.getInstance();
 
 export class UserService {
     constructor(private userRepository: IUserRepository) { }
@@ -29,7 +31,7 @@ export class UserService {
         const tokenExpires = new Date(Date.now() + 1000 * 60 * 60); // 1 hora
 
         // Hash password antes de guardar
-        userData.passwordHash = await bcrypt.hash(userData.passwordHash, 10);
+        userData.passwordHash = await hasher.hash(userData.passwordHash);
         const user = await this.userRepository.create({
             ...userData,
             emailVerified: false,
@@ -48,7 +50,7 @@ export class UserService {
             throw new BadRequestError(MESSAGES.ERROR.USER.NOT_FOUND);
         }
 
-        const isMatch = await bcrypt.compare(password, user.passwordHash);
+        const isMatch = await hasher.compare(password, user.passwordHash);
         if (!isMatch) {
             throw new BadRequestError(MESSAGES.ERROR.AUTH.INVALID_CREDENTIALS);
         }
@@ -68,12 +70,12 @@ export class UserService {
             throw new NotFoundError(MESSAGES.ERROR.USER.NOT_FOUND);
         }
 
-        const isMatch = await bcrypt.compare(currentPassword, user.passwordHash);
+        const isMatch = await hasher.compare(currentPassword, user.passwordHash);
         if (!isMatch) {
             throw new UnauthorizedError(MESSAGES.ERROR.AUTH.INCORRECT_CURRENT_PASSWORD);
         }
 
-        const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+        const hashedNewPassword = await hasher.hash(newPassword);
         await this.userRepository.updateUser(userId, { passwordHash: hashedNewPassword });
     }
 

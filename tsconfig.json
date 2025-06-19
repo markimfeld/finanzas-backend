@@ -10,6 +10,19 @@
         "typeRoots": [
             "./node_modules/@types",
             "./src/types"
-        ]
-    }
+        ],
+        "baseUrl": "./",
+        "paths": {
+            "@/*": [
+                "src/*"
+            ]
+        }
+    },
+    "include": [
+        "src/**/*"
+    ], // ✅ solo incluye src
+    "exclude": [
+        "tests",
+        "dist"
+    ] // ✅ excluye tests y salida compilada
 }
