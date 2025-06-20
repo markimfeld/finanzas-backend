@@ -3,7 +3,7 @@ import request from 'supertest';
 import app from '../../src/app';
 import { connectToDatabase, disconnectToDatabase } from '../../src/config/database';
 import { UserModel } from '../../src/models/user.model';
-import { createTestUser } from '../helpers/test.helpers';
+import { createTestUser, getAuthToken } from '../helpers/test.helpers';
 import { MESSAGES } from '../../src/constants/messages';
 
 beforeAll(async () => {
@@ -80,5 +80,57 @@ describe('Auth: Login', () => {
         expect(res.body).toHaveProperty('errors');
         expect(res.body.errors[0]).toHaveProperty('message');
         expect(res.body.errors[0].message).toBe(MESSAGES.ERROR.AUTH.EMAIL_NOT_VERIFIED);
+    });
+});
+
+describe('User: Register', () => {
+    beforeEach(async () => {
+        await UserModel.deleteMany({});
+    });
+
+    it('Should register a new user successfully', async () => {
+        const res = await request(app)
+            .post('/api/users')
+            .send({
+                name: 'New User',
+                email: 'sebastianimfeld@gmail.com',
+                passwordHash: 'StrongPass123!',
+                role: 'user',
+            });
+
+        expect(res.status).toBe(201); // o 200 según tu implementación
+        expect(res.body).toHaveProperty('success', true);
+        expect(res.body).toHaveProperty('data');
+        expect(res.body.data.email).toBe('sebastianimfeld@gmail.com');
+        expect(res.body.data).toHaveProperty('emailVerified', false);
+    });
+
+    it('Should fail if email already exists', async () => {
+        const access_token = await getAuthToken('sebastianimfeld@gmail.com');
+
+        const res = await request(app)
+            .post('/api/users')
+            .set('Authorization', `Bearer ${access_token}`)
+            .send({
+                name: 'User Dup',
+                email: 'sebastianimfeld@gmail.com',
+                passwordHash: 'StrongPass123!',
+                role: 'user',
+            });
+
+        expect(res.status).toBe(409); // Conflict
+        expect(res.body).toHaveProperty('errors');
+        expect(res.body.errors[0].message).toBe(MESSAGES.ERROR.USER.ALREADY_EXISTS);
+    });
+
+    it('Should fail if required fields are missing', async () => {
+        const res = await request(app)
+            .post('/api/users')
+            .send({}); // vacío
+
+        expect(res.status).toBe(400);
+        expect(res.body).toHaveProperty('errors');
+        expect(Array.isArray(res.body.errors)).toBe(true);
+        expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
     });
 });

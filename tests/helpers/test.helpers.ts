@@ -1,6 +1,9 @@
 import { UserModel } from '../../src/models/user.model';
 import Hasher from '../../src/utils/hash.util';
 
+import request from 'supertest';
+import app from '../../src/app';
+
 const hasher = Hasher.getInstance();
 
 export async function createTestUser(overrides: Partial<{
@@ -19,7 +22,24 @@ export async function createTestUser(overrides: Partial<{
         passwordHash: hashedPassword,
         role: overrides.role || 'admin',
         emailVerified: overrides.emailVerified ?? true,
-    }).save();
+    });
+
+    await user.save();
 
     return { user, plainPassword: password }
+}
+
+export async function getAuthToken(email = 'test@example.com', password = 'StrongPass123!') {
+    // Asegurate de que exista el usuario
+    await createTestUser({ email, password: password, emailVerified: true });
+
+    const res = await request(app)
+        .post('/api/auth/login')
+        .send({ email, password });
+
+    if (res.status !== 200 || !res.body.data?.access_token) {
+        throw new Error(`No se pudo obtener el token. Status: ${res.status}`);
+    }
+
+    return res.body.data.access_token;
 }
