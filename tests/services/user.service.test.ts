@@ -1,13 +1,10 @@
 
 import request from 'supertest';
-import app from '../../../src/app';
-import { connectToDatabase, disconnectToDatabase } from '../../../src/config/database';
-import { UserModel } from '../../../src/models/user.model';
-import Hasher from '../../../src/utils/hash.util';
-import { createTestUser } from '../../helpers/test.helpers';
-import { MESSAGES } from '../../../src/constants/messages';
-
-const hasher = Hasher.getInstance();
+import app from '../../src/app';
+import { connectToDatabase, disconnectToDatabase } from '../../src/config/database';
+import { UserModel } from '../../src/models/user.model';
+import { createTestUser } from '../helpers/test.helpers';
+import { MESSAGES } from '../../src/constants/messages';
 
 beforeAll(async () => {
     await connectToDatabase();
