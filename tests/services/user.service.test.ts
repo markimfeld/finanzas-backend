@@ -15,7 +15,7 @@ afterAll(async () => {
     await disconnectToDatabase();
 });
 
-describe('Auth: Login', () => {
+describe('User: Login', () => {
     const userData = {
         name: 'Test User',
         email: 'test@example.com',
@@ -134,3 +134,64 @@ describe('User: Register', () => {
         expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
     });
 });
+
+describe('User: Change Password', () => {
+    let access_token: string;
+
+    beforeEach(async () => {
+        await UserModel.deleteMany({});
+        access_token = await getAuthToken('sebastianimfeld@gmail.com'); // test@example.com por default
+    });
+
+    it('Should change password successfully', async () => {
+        const res = await request(app)
+            .post('/api/auth/change-password')
+            .set('Authorization', `Bearer ${access_token}`)
+            .send({
+                currentPassword: 'StrongPass123!',
+                newPassword: 'NewPass456!',
+            });
+
+        expect(res.status).toBe(200);
+        expect(res.body).toHaveProperty('success', true);
+
+        // Intentar login con nueva contraseña
+        const loginRes = await request(app)
+            .post('/api/auth/login')
+            .send({
+                email: 'sebastianimfeld@gmail.com',
+                password: 'NewPass456!',
+            });
+
+        expect(loginRes.status).toBe(200);
+        expect(loginRes.body).toHaveProperty('success');
+        expect(loginRes.body).toHaveProperty('data');
+        expect(loginRes.body.data).toHaveProperty('access_token');
+    });
+
+    it('Should fail if current password is incorrect', async () => {
+        const res = await request(app)
+            .post('/api/auth/change-password')
+            .set('Authorization', `Bearer ${access_token}`)
+            .send({
+                currentPassword: 'WrongPassword!',
+                newPassword: 'NewPass456!',
+            });
+
+        expect(res.status).toBe(401);
+        expect(res.body.errors[0].message).toBe(MESSAGES.ERROR.AUTH.INCORRECT_CURRENT_PASSWORD);
+    });
+
+    it('Should fail if no token is provided', async () => {
+        const res = await request(app)
+            .post('/api/auth/change-password')
+            .send({
+                currentPassword: 'StrongPass123!',
+                newPassword: 'NewPass456!',
+            });
+
+        expect(res.status).toBe(401);
+        expect(res.body).toHaveProperty('errors');
+    });
+});
+
