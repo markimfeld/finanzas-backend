@@ -3,6 +3,7 @@ import Hasher from '../../src/utils/hash.util';
 
 import request from 'supertest';
 import app from '../../src/app';
+import { IUser } from '../../src/interfaces/repositories/user.repository.interface';
 
 const hasher = Hasher.getInstance();
 
@@ -42,4 +43,8 @@ export async function getAuthToken(email = 'test@example.com', password = 'Stron
     }
 
     return res.body.data.access_token;
+}
+
+export async function getOne(email = 'test@example.com') {
+    return await UserModel.findOne({ email }).lean<IUser>().exec()
 }

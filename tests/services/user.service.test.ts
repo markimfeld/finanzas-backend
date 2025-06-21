@@ -3,8 +3,9 @@ import request from 'supertest';
 import app from '../../src/app';
 import { connectToDatabase, disconnectToDatabase } from '../../src/config/database';
 import { UserModel } from '../../src/models/user.model';
-import { createTestUser, getAuthToken } from '../helpers/test.helpers';
+import { createTestUser, getAuthToken, getOne } from '../helpers/test.helpers';
 import { MESSAGES } from '../../src/constants/messages';
+import { IUser } from '../../src/interfaces/repositories/user.repository.interface';
 
 beforeAll(async () => {
     await connectToDatabase();
@@ -192,6 +193,34 @@ describe('User: Change Password', () => {
 
         expect(res.status).toBe(401);
         expect(res.body).toHaveProperty('errors');
+    });
+});
+
+describe('User: Logout', () => {
+    let access_token: string;
+    let user: IUser | null;
+
+    beforeEach(async () => {
+        await UserModel.deleteMany({});
+        access_token = await getAuthToken('sebastianimfeld@gmail.com'); // test@example.com por default
+        user = await getOne('sebastianimfeld@gmail.com');
+    });
+
+
+    it('Should logout successfully', async () => {
+        const res = await request(app)
+            .post('/api/auth/logout')
+            .set('Authorization', `Bearer ${access_token}`)
+            .send({
+                refreshToken: user?.refreshToken
+            });
+
+        expect(res.status).toBe(200);
+        expect(res.body).toHaveProperty('success', true);
+        expect(res.body.message).toBe(MESSAGES.SUCCESS.USER.LOGGED_OUT);
+
+        user = await getOne('sebastianimfeld@gmail.com');
+        expect(user?.refreshToken).toBe('');
     });
 });
 
