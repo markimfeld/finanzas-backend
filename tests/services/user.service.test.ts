@@ -286,3 +286,31 @@ describe('User: Verify email', () => {
         expect(userUpdated?.emailVerificationToken).toBe('');
     });
 });
+
+describe('User: Resend verification email', () => {
+
+    beforeEach(async () => {
+        await UserModel.deleteMany({});
+    });
+
+    it('Should resend verification email successfully', async () => {
+
+        await request(app)
+            .post('/api/users')
+            .send({
+                name: 'New User',
+                email: 'sebastianimfeld@gmail.com',
+                passwordHash: 'StrongPass123!',
+                role: 'user',
+            });
+
+        const res = await request(app)
+            .post(`/api/auth/resend-verification`)
+            .send({
+                email: 'sebastianimfeld@gmail.com'
+            })
+
+        expect(res.status).toBe(200);
+        expect(res.body.message).toBe(MESSAGES.SUCCESS.AUTH.VERIFICATION_EMAIL_RESENT);
+    });
+});
