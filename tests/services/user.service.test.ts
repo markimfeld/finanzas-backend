@@ -224,3 +224,28 @@ describe('User: Logout', () => {
     });
 });
 
+describe('User: Refresh token', () => {
+    let access_token: string;
+    let user: IUser | null;
+
+    beforeEach(async () => {
+        await UserModel.deleteMany({});
+        access_token = await getAuthToken('sebastianimfeld@gmail.com'); // test@example.com por default
+        user = await getOne('sebastianimfeld@gmail.com');
+    });
+
+
+    it('Should refresh token successfully', async () => {
+        const res = await request(app)
+            .post('/api/auth/refresh-token')
+            .set('Authorization', `Bearer ${access_token}`)
+            .send({
+                refreshToken: user?.refreshToken
+            });
+
+        expect(res.status).toBe(200);
+        expect(res.body).toHaveProperty('success', true);
+        expect(res.body.data).toHaveProperty('access_token');
+        expect(res.body.message).toBe(MESSAGES.SUCCESS.USER.TOKEN_REFRESHED);
+    });
+});

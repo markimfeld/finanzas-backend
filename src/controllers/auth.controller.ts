@@ -67,7 +67,7 @@ export const refreshAccessToken = async (
 
         const newAccessToken = generateAccessToken({ userId: user._id, role: user.role as IUserRole });
 
-        res.json({
+        res.status(200).json({
             success: true,
             data: AuthResponseDTO.from(user, newAccessToken),
             message: MESSAGES.SUCCESS.USER.TOKEN_REFRESHED,
