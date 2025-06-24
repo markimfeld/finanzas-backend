@@ -249,3 +249,40 @@ describe('User: Refresh token', () => {
         expect(res.body.message).toBe(MESSAGES.SUCCESS.USER.TOKEN_REFRESHED);
     });
 });
+
+describe('User: Verify email', () => {
+
+    let user: any;
+
+    beforeEach(async () => {
+        await UserModel.deleteMany({});
+    });
+
+    it('Should verify email successfully', async () => {
+
+        await request(app)
+            .post('/api/users')
+            .send({
+                name: 'New User',
+                email: 'sebastianimfeld@gmail.com',
+                passwordHash: 'StrongPass123!',
+                role: 'user',
+            });
+
+        user = await getOne('sebastianimfeld@gmail.com');
+
+        expect(user?.emailVerified).toBe(false);
+        expect(user?.emailVerificationToken).not.toBe('');
+
+        const res = await request(app)
+            .get(`/api/auth/verify-email/${user.emailVerificationToken}`)
+
+        expect(res.status).toBe(200);
+        expect(res.body).toHaveProperty('success', true);
+        expect(res.body.message).toBe(MESSAGES.SUCCESS.AUTH.EMAIL_VERIFIED);
+
+        let userUpdated = await getOne('sebastianimfeld@gmail.com');
+        expect(userUpdated?.emailVerified).toBe(true);
+        expect(userUpdated?.emailVerificationToken).toBe('');
+    });
+});
