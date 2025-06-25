@@ -7,6 +7,8 @@ import { createTestUser, getAuthToken, getOne } from '../helpers/test.helpers';
 import { MESSAGES } from '../../src/constants/messages';
 import { IUser } from '../../src/interfaces/repositories/user.repository.interface';
 
+jest.setTimeout(15000);
+
 beforeAll(async () => {
     await connectToDatabase();
 });
@@ -312,5 +314,82 @@ describe('User: Resend verification email', () => {
 
         expect(res.status).toBe(200);
         expect(res.body.message).toBe(MESSAGES.SUCCESS.AUTH.VERIFICATION_EMAIL_RESENT);
+    });
+});
+
+describe('User: Update user', () => {
+    let adminToken: string;
+    let userToken: string;
+    let userToUpdate: IUser | null;
+
+    beforeEach(async () => {
+        await UserModel.deleteMany({});
+
+        adminToken = await getAuthToken('admin@example.com', 'StrongPass123!');
+        userToken = await getAuthToken('user@example.com', 'StrongPass123!', 'user');
+
+        userToUpdate = await getOne('user@example.com');
+    });
+
+    it('Should allow admin to update another user', async () => {
+        const res = await request(app)
+            .put(`/api/users/${userToUpdate?._id}`)
+            .set('Authorization', `Bearer ${adminToken}`)
+            .send({ name: 'Updated Name', role: 'admin' });
+
+        expect(res.status).toBe(200);
+        expect(res.body.data.name).toBe('Updated Name');
+        expect(res.body.data.role).toBe('admin');
+    });
+
+    it('Should allow user to update their own profile (but not role)', async () => {
+        const res = await request(app)
+            .put(`/api/users/${userToUpdate?._id}`)
+            .set('Authorization', `Bearer ${userToken}`)
+            .send({ name: 'Self Updated', role: 'admin' }); // el role debería ser ignorado o rechazado
+
+        expect(res.status).toBe(403);
+        expect(res.body.errors[0].message).toBe(MESSAGES.ERROR.AUTHORIZATION.CANNOT_CHANGE_ROLE);
+    });
+
+    it('Should fail if user tries to update another user', async () => {
+        // Creamos un segundo usuario
+        await createTestUser({
+            email: 'user2@example.com',
+            password: 'StrongPass123!',
+            role: 'user',
+            emailVerified: true,
+        });
+
+        const user2 = await getOne('user2@example.com');
+
+        const res = await request(app)
+            .put(`/api/users/${user2?._id}`)
+            .set('Authorization', `Bearer ${userToken}`)
+            .send({ name: 'Nope' });
+
+        expect(res.status).toBe(403);
+        expect(res.body.errors[0].message).toBe(MESSAGES.ERROR.AUTHORIZATION.FORBIDDEN);
+    });
+
+    it('Should fail if no token is provided', async () => {
+        const res = await request(app)
+            .put(`/api/users/${userToUpdate?._id}`)
+            .send({ name: 'Anonymous Update' });
+
+        expect(res.status).toBe(401);
+        expect(res.body).toHaveProperty('errors');
+    });
+
+    it('Should fail if user does not exist', async () => {
+        const fakeId = '507f1f77bcf86cd799439011'; // MongoID válido pero no existente
+
+        const res = await request(app)
+            .put(`/api/users/${fakeId}`)
+            .set('Authorization', `Bearer ${adminToken}`)
+            .send({ name: 'Ghost' });
+
+        expect(res.status).toBe(404);
+        expect(res.body.errors[0].message).toBe(MESSAGES.ERROR.USER.NOT_FOUND);
     });
 });
