@@ -1,4 +1,7 @@
 
+jest.mock('../../src/utils/email.util', () => ({
+    sendEmailVerification: jest.fn(),
+}));
 import request from 'supertest';
 import app from '../../src/app';
 import { connectToDatabase, disconnectToDatabase } from '../../src/config/database';
@@ -96,7 +99,7 @@ describe('User: Register', () => {
             .post('/api/users')
             .send({
                 name: 'New User',
-                email: 'sebastianimfeld@gmail.com',
+                email: 'anEmail@example.com',
                 passwordHash: 'StrongPass123!',
                 role: 'user',
             });
@@ -104,19 +107,19 @@ describe('User: Register', () => {
         expect(res.status).toBe(201); // o 200 según tu implementación
         expect(res.body).toHaveProperty('success', true);
         expect(res.body).toHaveProperty('data');
-        expect(res.body.data.email).toBe('sebastianimfeld@gmail.com');
+        expect(res.body.data.email).toBe('anEmail@example.com');
         expect(res.body.data).toHaveProperty('emailVerified', false);
     });
 
     it('Should fail if email already exists', async () => {
-        const access_token = await getAuthToken('sebastianimfeld@gmail.com');
+        const access_token = await getAuthToken('anEmail@example.com');
 
         const res = await request(app)
             .post('/api/users')
             .set('Authorization', `Bearer ${access_token}`)
             .send({
                 name: 'User Dup',
-                email: 'sebastianimfeld@gmail.com',
+                email: 'anEmail@example.com',
                 passwordHash: 'StrongPass123!',
                 role: 'user',
             });
@@ -143,7 +146,7 @@ describe('User: Change Password', () => {
 
     beforeEach(async () => {
         await UserModel.deleteMany({});
-        access_token = await getAuthToken('sebastianimfeld@gmail.com'); // test@example.com por default
+        access_token = await getAuthToken('change_password@example.com'); // test@example.com por default
     });
 
     it('Should change password successfully', async () => {
@@ -162,7 +165,7 @@ describe('User: Change Password', () => {
         const loginRes = await request(app)
             .post('/api/auth/login')
             .send({
-                email: 'sebastianimfeld@gmail.com',
+                email: 'change_password@example.com',
                 password: 'NewPass456!',
             });
 
@@ -204,8 +207,8 @@ describe('User: Logout', () => {
 
     beforeEach(async () => {
         await UserModel.deleteMany({});
-        access_token = await getAuthToken('sebastianimfeld@gmail.com'); // test@example.com por default
-        user = await getOne('sebastianimfeld@gmail.com');
+        access_token = await getAuthToken('logout_user@example.com'); // test@example.com por default
+        user = await getOne('logout_user@example.com');
     });
 
 
@@ -221,7 +224,7 @@ describe('User: Logout', () => {
         expect(res.body).toHaveProperty('success', true);
         expect(res.body.message).toBe(MESSAGES.SUCCESS.USER.LOGGED_OUT);
 
-        user = await getOne('sebastianimfeld@gmail.com');
+        user = await getOne('logout_user@example.com');
         expect(user?.refreshToken).toBe('');
     });
 });
@@ -232,8 +235,8 @@ describe('User: Refresh token', () => {
 
     beforeEach(async () => {
         await UserModel.deleteMany({});
-        access_token = await getAuthToken('sebastianimfeld@gmail.com'); // test@example.com por default
-        user = await getOne('sebastianimfeld@gmail.com');
+        access_token = await getAuthToken('refres_token@example.com'); // test@example.com por default
+        user = await getOne('refres_token@example.com');
     });
 
 
@@ -266,12 +269,12 @@ describe('User: Verify email', () => {
             .post('/api/users')
             .send({
                 name: 'New User',
-                email: 'sebastianimfeld@gmail.com',
+                email: 'verify_email@example.com',
                 passwordHash: 'StrongPass123!',
                 role: 'user',
             });
 
-        user = await getOne('sebastianimfeld@gmail.com');
+        user = await getOne('verify_email@example.com');
 
         expect(user?.emailVerified).toBe(false);
         expect(user?.emailVerificationToken).not.toBe('');
@@ -283,7 +286,7 @@ describe('User: Verify email', () => {
         expect(res.body).toHaveProperty('success', true);
         expect(res.body.message).toBe(MESSAGES.SUCCESS.AUTH.EMAIL_VERIFIED);
 
-        let userUpdated = await getOne('sebastianimfeld@gmail.com');
+        let userUpdated = await getOne('verify_email@example.com');
         expect(userUpdated?.emailVerified).toBe(true);
         expect(userUpdated?.emailVerificationToken).toBe('');
     });
@@ -301,7 +304,7 @@ describe('User: Resend verification email', () => {
             .post('/api/users')
             .send({
                 name: 'New User',
-                email: 'sebastianimfeld@gmail.com',
+                email: 'resend_verification_email@example.com',
                 passwordHash: 'StrongPass123!',
                 role: 'user',
             });
@@ -309,7 +312,7 @@ describe('User: Resend verification email', () => {
         const res = await request(app)
             .post(`/api/auth/resend-verification`)
             .send({
-                email: 'sebastianimfeld@gmail.com'
+                email: 'resend_verification_email@example.com'
             })
 
         expect(res.status).toBe(200);
