@@ -139,6 +139,23 @@ describe('User: Register', () => {
         expect(Array.isArray(res.body.errors)).toBe(true);
         expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
     });
+
+    it('Should fail if it is given weak password', async () => {
+        const res = await request(app)
+            .post('/api/users')
+            .send({
+                name: 'User Dup',
+                email: 'anEmail@example.com',
+                passwordHash: 'StrongPa',
+                role: 'user',
+            });
+
+        expect(res.status).toBe(400);
+        expect(res.body).toHaveProperty('errors');
+        expect(Array.isArray(res.body.errors)).toBe(true);
+        expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
+        expect(res.body.errors[0].message).toBe(MESSAGES.VALIDATION.USER.PASSWORD_WEAK);
+    });
 });
 
 describe('User: Change Password', () => {
