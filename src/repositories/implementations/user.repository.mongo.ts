@@ -6,12 +6,41 @@ export class UserRepositoryMongo implements IUserRepository {
     async create(user: IUser): Promise<IUser> {
         const created: UserDocument = await UserModel.create(user);
         // convertimos el Document a un objeto plano (sin métodos de Mongoose)
-        const { _id, name, email, passwordHash, refreshToken, role, emailVerified, emailVerificationToken, emailVerificationTokenExpires } = created.toObject();
-        return { _id, name, email, passwordHash, refreshToken, role, emailVerified, emailVerificationToken, emailVerificationTokenExpires };
+        const {
+            _id,
+            name,
+            email,
+            passwordHash,
+            refreshToken,
+            role,
+            emailVerified,
+            emailVerificationToken,
+            emailVerificationTokenExpires,
+            resetPasswordToken,
+            resetPasswordTokenExpires
+        } = created.toObject();
+        return {
+            _id,
+            name,
+            email,
+            passwordHash,
+            refreshToken,
+            role,
+            emailVerified,
+            emailVerificationToken,
+            emailVerificationTokenExpires,
+            resetPasswordToken,
+            resetPasswordTokenExpires
+        };
     }
 
     async findByEmail(email: string): Promise<IUser | null> {
         const found = await UserModel.findOne({ email }).lean<IUser>().exec();
+        return found ?? null;
+    }
+
+    async findByResetToken(resetPasswordToken: string): Promise<IUser | null> {
+        const found = await UserModel.findOne({ resetPasswordToken }).lean<IUser>().exec();
         return found ?? null;
     }
 

@@ -10,7 +10,9 @@ export interface IUser {
     role: IUserRole;
     emailVerified: boolean;
     emailVerificationToken?: string;
-    emailVerificationTokenExpires?: Date
+    emailVerificationTokenExpires?: Date;
+    resetPasswordToken: string;
+    resetPasswordTokenExpires: Date;
 }
 
 /** Documento que Mongoose guarda en la colección */
@@ -23,6 +25,8 @@ const userSchema = new Schema<UserDocument>(
         emailVerified: { type: Boolean, default: false },
         emailVerificationToken: { type: String },
         emailVerificationTokenExpires: { type: Date },
+        resetPasswordToken: { type: String },
+        resetPasswordTokenExpires: { type: Date },
         passwordHash: { type: String, required: true },
         refreshToken: { type: String, default: null },
         role: {
