@@ -154,3 +154,41 @@ export const resendVerificationEmail = async (req: Request, res: Response, next:
         next(error);
     }
 };
+
+export const forgotPassword = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    try {
+        const { email } = req.body;
+        await userService.forgotPassword(email);
+
+        res.status(200).json({
+            success: true,
+            message: MESSAGES.SUCCESS.AUTH.RESET_EMAIL_SENT,
+        });
+    } catch (err) {
+        next(err);
+    }
+};
+
+export const resetPassword = async (
+    req: Request<{ token: string }, {}, { newPassword: string }>,
+    res: Response,
+    next: NextFunction
+) => {
+    try {
+        const { token } = req.params;
+        const { newPassword } = req.body;
+
+        await userService.resetPassword(token, newPassword);
+
+        res.status(200).json({
+            success: true,
+            message: MESSAGES.SUCCESS.AUTH.PASSWORD_UPDATED,
+        });
+    } catch (err) {
+        next(err);
+    }
+};

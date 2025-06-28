@@ -9,7 +9,7 @@ import { CreateUserDto } from '../dtos/createUser.dto';
 import { UpdateUserDto } from '../dtos/updateUser.dto';
 //utils
 import { generateAccessToken } from '../utils/token.util';
-import { sendEmailVerification } from '../utils/email.util';
+import { sendEmailVerification, sendResetPasswordEmail } from '../utils/email.util';
 import Hasher from '../utils/hash.util';
 // roles interface
 import { IUserRole } from '../interfaces/common/roles.interface';
@@ -165,5 +165,43 @@ export class UserService {
         await sendEmailVerification(user.email, token);
 
         return user;
+    }
+
+    async forgotPassword(email: string): Promise<IUser | void> {
+        const user = await this.userRepository.findByEmail(email);
+        if (!user) return; // Por seguridad, no lanzar error
+
+        const token = crypto.randomBytes(32).toString('hex');
+        const expires = new Date(Date.now() + 1000 * 60 * 30); // 30 minutos
+
+        await this.userRepository.updateUser(user._id, {
+            resetPasswordToken: token,
+            resetPasswordTokenExpires: expires,
+        });
+
+        await sendResetPasswordEmail(user.email, token);
+
+        return user;
+    }
+
+    async resetPassword(resetPasswordToken: string, newPassword: string): Promise<IUser | null> {
+        const user = await this.userRepository.findByResetToken(resetPasswordToken);
+        if (
+            !user ||
+            !user.resetPasswordTokenExpires ||
+            user.resetPasswordTokenExpires < new Date()
+        ) {
+            throw new BadRequestError(MESSAGES.ERROR.AUTH.INVALID_OR_EXPIRED_TOKEN);
+        }
+
+        const hashedPassword = await hasher.hash(newPassword);
+
+        const userUpdated = await this.userRepository.updateUser(user._id, {
+            passwordHash: hashedPassword,
+            resetPasswordToken: '',
+            resetPasswordTokenExpires: new Date(Date.now() - 1000),
+        });
+
+        return userUpdated;
     }
 }

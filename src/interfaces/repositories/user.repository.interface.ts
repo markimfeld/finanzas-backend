@@ -11,11 +11,14 @@ export interface IUser {
     emailVerified: boolean;
     emailVerificationToken?: string
     emailVerificationTokenExpires?: Date
+    resetPasswordToken: string;
+    resetPasswordTokenExpires: Date;
 }
 
 export interface IUserRepository {
     create(user: CreateUserDto): Promise<IUser>;
     findByEmail(email: string): Promise<IUser | null>;
+    findByResetToken(resetPasswordToken: string): Promise<IUser | null>;
     findById(userId: string): Promise<IUser | null>;
     findAll(): Promise<IUser[]>;
     updateRefreshToken(userId: string, refreshToken: string): Promise<void>;
