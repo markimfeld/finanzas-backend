@@ -96,3 +96,31 @@ export const updateUser = async (
         next(error);
     }
 };
+
+export const getUserById = async (
+    req: Request<{ id: string }>,
+    res: Response,
+    next: NextFunction
+): Promise<void> => {
+    try {
+        const requestedId = req.params.id;
+        const authenticatedUser = req.user!;
+
+        const isAdmin = authenticatedUser.role === USER_ROLES.ADMIN;
+        const isSelf = authenticatedUser.userId === requestedId;
+
+        if (!isAdmin && !isSelf) {
+            throw new ForbiddenError(MESSAGES.ERROR.AUTHORIZATION.FORBIDDEN);
+        }
+
+        const user = await userService.getUserById(requestedId);
+        const safeUser = UserDTO.from(user);
+
+        res.status(200).json({
+            success: true,
+            data: safeUser
+        });
+    } catch (error) {
+        next(error);
+    }
+};

@@ -523,3 +523,60 @@ describe('User: Reset Password', () => {
         expect(res.body.errors[0].message).toBe(MESSAGES.ERROR.AUTH.INVALID_OR_EXPIRED_TOKEN);
     });
 });
+
+describe('User: Get by ID', () => {
+    let adminToken: string;
+    let userToken: string;
+    let admin: IUser | any;
+    let user: IUser | any;
+
+    beforeEach(async () => {
+        await UserModel.deleteMany({});
+
+        adminToken = await getAuthToken('admin_getId@example.com', 'StrongPass123!');
+        userToken = await getAuthToken('user_getId@example.com', 'StrongPass123!', 'user');
+
+        admin = await getOne('admin_getId@example.com');
+        user = await getOne('user_getId@example.com');
+    });
+
+    it('should allow admin to get any user', async () => {
+        const res = await request(app)
+            .get(`/api/users/${user._id}`)
+            .set('Authorization', `Bearer ${adminToken}`);
+
+        expect(res.status).toBe(200);
+        expect(res.body.success).toBe(true);
+        expect(res.body.data.email).toBe(user.email);
+    });
+
+    it('should allow user to get themselves', async () => {
+        const res = await request(app)
+            .get(`/api/users/${user._id}`)
+            .set('Authorization', `Bearer ${userToken}`);
+
+        expect(res.status).toBe(200);
+        expect(res.body.success).toBe(true);
+        expect(res.body.data.email).toBe(user.email);
+    });
+
+    it('should forbid user from accessing another user', async () => {
+        const res = await request(app)
+            .get(`/api/users/${admin._id}`)
+            .set('Authorization', `Bearer ${userToken}`);
+
+        expect(res.status).toBe(403);
+        expect(res.body.errors[0].message).toBe(MESSAGES.ERROR.AUTHORIZATION.FORBIDDEN);
+    });
+
+    it('should return 404 if user not found', async () => {
+        const nonExistingId = '507f1f77bcf86cd799439011'; // ID válido pero no existe
+
+        const res = await request(app)
+            .get(`/api/users/${nonExistingId}`)
+            .set('Authorization', `Bearer ${adminToken}`);
+
+        expect(res.status).toBe(404);
+        expect(res.body.errors[0].message).toBe(MESSAGES.ERROR.USER.NOT_FOUND);
+    });
+});
