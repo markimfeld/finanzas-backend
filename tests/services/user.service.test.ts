@@ -1,6 +1,7 @@
 
 jest.mock('../../src/utils/email.util', () => ({
     sendEmailVerification: jest.fn(),
+    sendResetPasswordEmail: jest.fn()
 }));
 import request from 'supertest';
 import app from '../../src/app';
@@ -9,8 +10,11 @@ import { UserModel } from '../../src/models/user.model';
 import { createTestUser, getAuthToken, getOne } from '../helpers/test.helpers';
 import { MESSAGES } from '../../src/constants/messages';
 import { IUser } from '../../src/interfaces/repositories/user.repository.interface';
+import Hasher from '../../src/utils/hash.util';
 
 jest.setTimeout(15000);
+
+const hasher = Hasher.getInstance();
 
 beforeAll(async () => {
     await connectToDatabase();
@@ -411,5 +415,111 @@ describe('User: Update user', () => {
 
         expect(res.status).toBe(404);
         expect(res.body.errors[0].message).toBe(MESSAGES.ERROR.USER.NOT_FOUND);
+    });
+});
+
+describe('User: Forgot Password', () => {
+    const email = 'forgot@example.com';
+
+    beforeEach(async () => {
+        await UserModel.deleteMany({});
+        await createTestUser({ email });
+    });
+
+    it('should send 200 even if email does not exist', async () => {
+        const res = await request(app).post('/api/auth/forgot-password').send({
+            email: 'doesnotexist@example.com',
+        });
+
+        expect(res.status).toBe(200);
+        expect(res.body).toHaveProperty('success', true);
+        expect(res.body.message).toBe(MESSAGES.SUCCESS.AUTH.RESET_EMAIL_SENT);
+    });
+
+    it('should send reset email and return 200 if email exists', async () => {
+        const res = await request(app).post('/api/auth/forgot-password').send({
+            email,
+        });
+
+        expect(res.status).toBe(200);
+        expect(res.body).toHaveProperty('success', true);
+        expect(res.body.message).toBe(MESSAGES.SUCCESS.AUTH.RESET_EMAIL_SENT);
+
+        const user = await UserModel.findOne({ email });
+
+        expect(user?.resetPasswordToken).not.toBe('');
+        expect(user?.resetPasswordTokenExpires).not.toBe('');
+    });
+});
+
+describe('User: Reset Password', () => {
+    const email = 'resetpass@example.com';
+    let resetToken: string;
+
+    beforeEach(async () => {
+        await UserModel.deleteMany({});
+
+        // Crear usuario manualmente con token válido
+        resetToken = 'validresettoken123';
+
+        const expires = new Date(Date.now() + 1000 * 60 * 30); // 30 minutos
+
+        await UserModel.create({
+            name: 'User Reset',
+            email,
+            passwordHash: 'OldPass123!',
+            role: 'user',
+            emailVerified: true,
+            resetPasswordToken: resetToken,
+            resetPasswordTokenExpires: expires,
+        });
+    });
+
+    it('should reset password with valid token', async () => {
+        const res = await request(app)
+            .post(`/api/auth/reset-password/${resetToken}`)
+            .send({
+                newPassword: 'NewPassword456!',
+            });
+
+        expect(res.status).toBe(200);
+        expect(res.body.success).toBe(true);
+        expect(res.body.message).toBe(MESSAGES.SUCCESS.AUTH.PASSWORD_UPDATED);
+
+        const user = await UserModel.findOne({ email });
+
+        expect(user?.resetPasswordToken).toBe('');
+        expect(user?.resetPasswordTokenExpires.getTime()).toBeLessThan(Date.now());
+
+        const isMatch = await hasher.compare('NewPassword456!', user!.passwordHash);
+        expect(isMatch).toBe(true);
+
+        const stillOld = await hasher.compare('OldPass123!', user!.passwordHash);
+        expect(stillOld).toBe(false);
+    });
+
+    it('should fail if token is invalid', async () => {
+        const res = await request(app)
+            .post(`/api/auth/reset-password/invalidtoken`)
+            .send({
+                newPassword: 'Whatever123!',
+            });
+
+        expect(res.status).toBe(400);
+        expect(res.body.errors[0].message).toBe(MESSAGES.ERROR.AUTH.INVALID_OR_EXPIRED_TOKEN);
+    });
+
+    it('should fail if token is expired', async () => {
+        // Expirar manualmente el token
+        await UserModel.updateOne({ email }, { resetPasswordTokenExpires: new Date(Date.now() - 1000) });
+
+        const res = await request(app)
+            .post(`/api/auth/reset-password/${resetToken}`)
+            .send({
+                newPassword: 'Whatever123!',
+            });
+
+        expect(res.status).toBe(400);
+        expect(res.body.errors[0].message).toBe(MESSAGES.ERROR.AUTH.INVALID_OR_EXPIRED_TOKEN);
     });
 });
