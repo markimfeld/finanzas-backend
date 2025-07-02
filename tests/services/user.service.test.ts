@@ -91,6 +91,24 @@ describe('User: Login', () => {
         expect(res.body.errors[0]).toHaveProperty('message');
         expect(res.body.errors[0].message).toBe(MESSAGES.ERROR.AUTH.EMAIL_NOT_VERIFIED);
     });
+
+    it('should not allow login if user is inactive', async () => {
+        const inactiveUser = await createTestUser({
+            email: 'inactive@example.com',
+            isActive: false,
+            emailVerified: true,
+        });
+
+        const res = await request(app)
+            .post('/api/auth/login')
+            .send({
+                email: inactiveUser.user.email,
+                password: 'StrongPass123!',
+            });
+
+        expect(res.status).toBe(401);
+        expect(res.body.errors[0].message).toBe(MESSAGES.ERROR.USER.NOT_FOUND);
+    });
 });
 
 describe('User: Register', () => {
@@ -574,6 +592,106 @@ describe('User: Get by ID', () => {
 
         const res = await request(app)
             .get(`/api/users/${nonExistingId}`)
+            .set('Authorization', `Bearer ${adminToken}`);
+
+        expect(res.status).toBe(404);
+        expect(res.body.errors[0].message).toBe(MESSAGES.ERROR.USER.NOT_FOUND);
+    });
+});
+
+describe('User: Deactivate (soft delete)', () => {
+    let adminToken: string;
+    let userToken: string;
+    let user: IUser | null;
+
+    beforeEach(async () => {
+        await UserModel.deleteMany({});
+        adminToken = await getAuthToken('admin_getId@example.com', 'StrongPass123!');
+        userToken = await getAuthToken('user_getId@example.com', 'StrongPass123!', 'user');
+
+        user = await getOne('user_getId@example.com');
+    });
+
+    it('should deactivate user as admin', async () => {
+        const userActive = await UserModel.findById(user?._id);
+        expect(userActive?.isActive).toBe(true);
+
+        const res = await request(app)
+            .patch(`/api/users/${user?._id}/deactivate`)
+            .set('Authorization', `Bearer ${adminToken}`);
+
+        expect(res.status).toBe(200);
+        expect(res.body.success).toBe(true);
+        expect(res.body.data.isActive).toBe(false);
+    });
+
+    it('should forbid non-admin from deactivating user', async () => {
+
+        const res = await request(app)
+            .patch(`/api/users/${user?._id}/deactivate`)
+            .set('Authorization', `Bearer ${userToken}`);
+
+        expect(res.status).toBe(403);
+        expect(res.body.errors[0].message).toBe(MESSAGES.ERROR.AUTHORIZATION.FORBIDDEN);
+    });
+
+    it('should return 404 if user not found', async () => {
+        const fakeId = '507f1f77bcf86cd799439011';
+
+        const res = await request(app)
+            .patch(`/api/users/${fakeId}/deactivate`)
+            .set('Authorization', `Bearer ${adminToken}`);
+
+        expect(res.status).toBe(404);
+        expect(res.body.errors[0].message).toBe(MESSAGES.ERROR.USER.NOT_FOUND);
+    });
+});
+
+describe('User: Activate user', () => {
+    let adminToken: string;
+    let userToken: string;
+    let user: IUser | null;
+
+    beforeEach(async () => {
+        await UserModel.deleteMany({});
+        adminToken = await getAuthToken('admin_getId@example.com', 'StrongPass123!');
+        userToken = await getAuthToken('user_getId@example.com', 'StrongPass123!', 'user');
+
+        user = await getOne('user_getId@example.com');
+    });
+
+    it('should activate user as admin', async () => {
+        await request(app)
+            .patch(`/api/users/${user?._id}/deactivate`)
+            .set('Authorization', `Bearer ${adminToken}`);
+
+        const userActive = await UserModel.findById(user?._id);
+        expect(userActive?.isActive).toBe(false);
+
+        const res = await request(app)
+            .patch(`/api/users/${user?._id}/activate`)
+            .set('Authorization', `Bearer ${adminToken}`);
+
+        expect(res.status).toBe(200);
+        expect(res.body.success).toBe(true);
+        expect(res.body.data.isActive).toBe(true);
+    });
+
+    it('should forbid non-admin from activating user', async () => {
+
+        const res = await request(app)
+            .patch(`/api/users/${user?._id}/deactivate`)
+            .set('Authorization', `Bearer ${userToken}`);
+
+        expect(res.status).toBe(403);
+        expect(res.body.errors[0].message).toBe(MESSAGES.ERROR.AUTHORIZATION.FORBIDDEN);
+    });
+
+    it('should return 404 if user not found', async () => {
+        const fakeId = '507f1f77bcf86cd799439011';
+
+        const res = await request(app)
+            .patch(`/api/users/${fakeId}/deactivate`)
             .set('Authorization', `Bearer ${adminToken}`);
 
         expect(res.status).toBe(404);

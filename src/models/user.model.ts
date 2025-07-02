@@ -13,6 +13,7 @@ export interface IUser {
     emailVerificationTokenExpires?: Date;
     resetPasswordToken: string;
     resetPasswordTokenExpires: Date;
+    isActive: boolean;
 }
 
 /** Documento que Mongoose guarda en la colección */
@@ -33,6 +34,10 @@ const userSchema = new Schema<UserDocument>(
             type: String,
             enum: ['admin', 'user', 'viewer'],
             default: 'user'
+        },
+        isActive: {
+            type: Boolean,
+            default: true,
         }
     },
     { timestamps: true }     // createdAt / updatedAt

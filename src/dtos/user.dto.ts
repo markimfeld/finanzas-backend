@@ -14,6 +14,9 @@ export class UserDTO {
     emailVerified: boolean;
     emailVerificationToken?: string;
     emailVerificationTokenExpires?: Date;
+    resetPasswordToken: string;
+    resetPasswordTokenExpires: Date;
+    isActive: boolean;
 
 
     constructor(user: IUser & { _id: any }) {
@@ -25,6 +28,9 @@ export class UserDTO {
         this.emailVerified = user.emailVerified;
         this.emailVerificationToken = user.emailVerificationToken;
         this.emailVerificationTokenExpires = user.emailVerificationTokenExpires;
+        this.resetPasswordToken = user.resetPasswordToken;
+        this.resetPasswordTokenExpires = user.resetPasswordTokenExpires;
+        this.isActive = user.isActive;
     }
 
     static fromMany(users: (IUser & { _id: any })[]): UserDTO[] {

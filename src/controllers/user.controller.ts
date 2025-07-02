@@ -124,3 +124,55 @@ export const getUserById = async (
         next(error);
     }
 };
+
+export const deactivateUser = async (
+    req: Request<{ id: string }>,
+    res: Response,
+    next: NextFunction
+): Promise<void> => {
+    try {
+        const { id } = req.params;
+        const user = req.user!;
+
+        if (user.role !== USER_ROLES.ADMIN) {
+            throw new ForbiddenError(MESSAGES.ERROR.AUTHORIZATION.FORBIDDEN);
+        }
+
+        const updatedUser = await userService.deactivateUser(id);
+        const safeUser = UserDTO.from(updatedUser);
+
+        res.status(200).json({
+            success: true,
+            data: safeUser,
+            message: MESSAGES.SUCCESS.USER.DEACTIVATED,
+        });
+    } catch (err) {
+        next(err);
+    }
+};
+
+export const activateUser = async (
+    req: Request<{ id: string }>,
+    res: Response,
+    next: NextFunction
+): Promise<void> => {
+    try {
+        const { id } = req.params;
+        const authenticatedUser = req.user!;
+
+        if (authenticatedUser.role !== USER_ROLES.ADMIN) {
+            throw new ForbiddenError(MESSAGES.ERROR.AUTHORIZATION.FORBIDDEN);
+        }
+
+        const user = await userService.activateUser(id);
+        const safeUser = UserDTO.from(user);
+
+        res.status(200).json({
+            success: true,
+            data: safeUser,
+            message: MESSAGES.SUCCESS.USER.ACTIVATED,
+        });
+    } catch (error) {
+        next(error);
+    }
+};

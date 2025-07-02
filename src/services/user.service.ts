@@ -46,8 +46,13 @@ export class UserService {
 
     async loginUser(email: string, password: string): Promise<{ user: IUser, access_token: string }> {
         const user = await this.userRepository.findByEmail(email);
+
         if (!user || !user.passwordHash) {
             throw new BadRequestError(MESSAGES.ERROR.USER.NOT_FOUND);
+        }
+
+        if (!user?.isActive) {
+            throw new UnauthorizedError(MESSAGES.ERROR.USER.NOT_FOUND);
         }
 
         const isMatch = await hasher.compare(password, user.passwordHash);
@@ -203,5 +208,32 @@ export class UserService {
         });
 
         return userUpdated;
+    }
+
+    async deactivateUser(userId: string): Promise<IUser> {
+        const user = await this.userRepository.findById(userId);
+        if (!user) throw new NotFoundError(MESSAGES.ERROR.USER.NOT_FOUND);
+
+        user.isActive = false;
+
+        const updatedUser = await this.userRepository.updateUser(userId, user);
+
+        if (!updatedUser) throw new NotFoundError(MESSAGES.ERROR.USER.NOT_FOUND);
+
+        return updatedUser;
+    }
+
+    async activateUser(userId: string): Promise<IUser> {
+        const user = await this.userRepository.findById(userId);
+        if (!user) {
+            throw new NotFoundError(MESSAGES.ERROR.USER.NOT_FOUND);
+        }
+
+        user.isActive = true;
+        const updatedUser = await this.userRepository.updateUser(userId, user);
+
+        if (!updatedUser) throw new NotFoundError(MESSAGES.ERROR.USER.NOT_FOUND);
+
+        return updatedUser;
     }
 }

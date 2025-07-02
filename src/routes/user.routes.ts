@@ -1,5 +1,5 @@
 import express from "express";
-import { createUser, getAllUsers, getUserById, updateUser } from "../controllers/user.controller";
+import { activateUser, createUser, deactivateUser, getAllUsers, getUserById, updateUser } from "../controllers/user.controller";
 import { validateZod } from "../middlewares/validateZod";
 import { createUserSchema, updateUserSchema } from "../validations/user.schema";
 import { authMiddleware } from "../middlewares/auth.middleware";
@@ -12,5 +12,7 @@ router.get("/", authMiddleware, authorize("users.read"), getAllUsers);
 router.get("/:id", authMiddleware, authorize("users.read"), getUserById);
 router.post("/", protectUserCreation, validateZod(createUserSchema), createUser);
 router.put("/:id", authMiddleware, authorize("users.update"), validateZod(updateUserSchema), updateUser);
+router.patch('/:id/deactivate', authMiddleware, authorize("users.delete"), deactivateUser);
+router.patch('/:id/activate', authMiddleware, authorize("users.delete"), activateUser);
 
 export default router;

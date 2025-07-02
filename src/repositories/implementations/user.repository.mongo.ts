@@ -17,7 +17,8 @@ export class UserRepositoryMongo implements IUserRepository {
             emailVerificationToken,
             emailVerificationTokenExpires,
             resetPasswordToken,
-            resetPasswordTokenExpires
+            resetPasswordTokenExpires,
+            isActive
         } = created.toObject();
         return {
             _id,
@@ -30,7 +31,8 @@ export class UserRepositoryMongo implements IUserRepository {
             emailVerificationToken,
             emailVerificationTokenExpires,
             resetPasswordToken,
-            resetPasswordTokenExpires
+            resetPasswordTokenExpires,
+            isActive
         };
     }
 
