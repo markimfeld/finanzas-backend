@@ -11,4 +11,7 @@ export interface CreateUserDto {
     emailVerified: boolean;
     emailVerificationToken?: string
     emailVerificationTokenExpires?: Date
+    resetPasswordToken: string;
+    resetPasswordTokenExpires: Date;
+    isActive: boolean;
 }

@@ -13,6 +13,7 @@ export interface IUser {
     emailVerificationTokenExpires?: Date
     resetPasswordToken: string;
     resetPasswordTokenExpires: Date;
+    isActive: boolean;
 }
 
 export interface IUserRepository {

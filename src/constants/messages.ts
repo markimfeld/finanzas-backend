@@ -47,6 +47,8 @@ export const MESSAGES = {
             LOGGED_IN: "You have successfully logged in.",
             LOGGED_OUT: "You have successfully logged out.",
             TOKEN_REFRESHED: "Access token renovated successfully.",
+            DEACTIVATED: "User deactivated successfully.",
+            ACTIVATED: "User activated successfully."
         },
         AUTH: {
             PASSWORD_UPDATED: "Password updated successfully",

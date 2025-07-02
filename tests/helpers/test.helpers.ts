@@ -13,6 +13,7 @@ export async function createTestUser(overrides: Partial<{
     password: string;
     role: string;
     emailVerified: boolean;
+    isActive: boolean;
 }> = {}) {
     const password = overrides.password || 'StrongPass123!';
     const hashedPassword = await hasher.hash(password);
@@ -23,6 +24,7 @@ export async function createTestUser(overrides: Partial<{
         passwordHash: hashedPassword,
         role: overrides.role || 'admin',
         emailVerified: overrides.emailVerified ?? true,
+        isActive: overrides.isActive ?? true,
     });
 
     await user.save();
