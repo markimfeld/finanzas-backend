@@ -182,10 +182,19 @@ describe('User: Register', () => {
 
 describe('User: Change Password', () => {
     let access_token: string;
+    let userInactiveToken: string;
+    let adminToken: string;
+    let userInactive: IUser | any;
 
     beforeEach(async () => {
         await UserModel.deleteMany({});
         access_token = await getAuthToken('change_password@example.com'); // test@example.com por default
+
+        adminToken = await getAuthToken('admin@example.com', 'StrongPass123!');
+
+        userInactiveToken = await getAuthToken('userInactive_getId@example.com', 'StrongPass123!', 'user', true);
+
+        userInactive = await getOne('userInactive_getId@example.com');
     });
 
     it('Should change password successfully', async () => {
@@ -238,16 +247,46 @@ describe('User: Change Password', () => {
         expect(res.status).toBe(401);
         expect(res.body).toHaveProperty('errors');
     });
+
+    it('should not allow change password user if user is inactive', async () => {
+
+        await request(app)
+            .patch(`/api/users/${userInactive?._id}/deactivate`)
+            .set('Authorization', `Bearer ${adminToken}`);
+
+        const res = await request(app)
+            .post('/api/auth/change-password')
+            .set('Authorization', `Bearer ${userInactiveToken}`)
+            .send({
+                currentPassword: 'WrongPassword!',
+                newPassword: 'NewPass456!',
+            });
+
+        const updatedUser = await getOne(userInactive.email);
+
+        expect(res.status).toBe(403);
+        expect(res.body.errors[0].message).toBe(MESSAGES.ERROR.AUTH.USER_INACTIVE);
+        expect(updatedUser?.isActive).toBe(false);
+    });
 });
 
 describe('User: Logout', () => {
     let access_token: string;
     let user: IUser | null;
+    let userInactiveToken: string;
+    let adminToken: string;
+    let userInactive: IUser | any;
 
     beforeEach(async () => {
         await UserModel.deleteMany({});
         access_token = await getAuthToken('logout_user@example.com'); // test@example.com por default
         user = await getOne('logout_user@example.com');
+
+        adminToken = await getAuthToken('admin@example.com', 'StrongPass123!');
+
+        userInactiveToken = await getAuthToken('userInactive_getId@example.com', 'StrongPass123!', 'user', true);
+
+        userInactive = await getOne('userInactive_getId@example.com');
     });
 
 
@@ -266,16 +305,45 @@ describe('User: Logout', () => {
         user = await getOne('logout_user@example.com');
         expect(user?.refreshToken).toBe('');
     });
+
+    it('should not allow logout user if user is inactive', async () => {
+
+        await request(app)
+            .patch(`/api/users/${userInactive?._id}/deactivate`)
+            .set('Authorization', `Bearer ${adminToken}`);
+
+        const res = await request(app)
+            .post('/api/auth/logout')
+            .set('Authorization', `Bearer ${userInactiveToken}`)
+            .send({
+                refreshToken: user?.refreshToken
+            });
+
+        const updatedUser = await getOne(userInactive.email);
+
+        expect(res.status).toBe(403);
+        expect(res.body.errors[0].message).toBe(MESSAGES.ERROR.AUTH.USER_INACTIVE);
+        expect(updatedUser?.isActive).toBe(false);
+    });
 });
 
 describe('User: Refresh token', () => {
     let access_token: string;
     let user: IUser | null;
+    let userInactiveToken: string;
+    let adminToken: string;
+    let userInactive: IUser | any;
 
     beforeEach(async () => {
         await UserModel.deleteMany({});
         access_token = await getAuthToken('refres_token@example.com'); // test@example.com por default
         user = await getOne('refres_token@example.com');
+
+        adminToken = await getAuthToken('admin@example.com', 'StrongPass123!');
+
+        userInactiveToken = await getAuthToken('userInactive_getId@example.com', 'StrongPass123!', 'user', true);
+
+        userInactive = await getOne('userInactive_getId@example.com');
     });
 
 
@@ -291,6 +359,26 @@ describe('User: Refresh token', () => {
         expect(res.body).toHaveProperty('success', true);
         expect(res.body.data).toHaveProperty('access_token');
         expect(res.body.message).toBe(MESSAGES.SUCCESS.USER.TOKEN_REFRESHED);
+    });
+
+    it('should not allow refresh token if user is inactive', async () => {
+
+        await request(app)
+            .patch(`/api/users/${userInactive?._id}/deactivate`)
+            .set('Authorization', `Bearer ${adminToken}`);
+
+        const res = await request(app)
+            .post('/api/auth/refresh-token')
+            .set('Authorization', `Bearer ${userInactiveToken}`)
+            .send({
+                refreshToken: user?.refreshToken
+            });
+
+        const updatedUser = await getOne(userInactive.email);
+
+        expect(res.status).toBe(403);
+        expect(res.body.errors[0].message).toBe(MESSAGES.ERROR.AUTH.USER_INACTIVE);
+        expect(updatedUser?.isActive).toBe(false);
     });
 });
 
@@ -362,15 +450,19 @@ describe('User: Resend verification email', () => {
 describe('User: Update user', () => {
     let adminToken: string;
     let userToken: string;
+    let userInactiveToken: string;
     let userToUpdate: IUser | null;
+    let userInactive: IUser | any;
 
     beforeEach(async () => {
         await UserModel.deleteMany({});
 
         adminToken = await getAuthToken('admin@example.com', 'StrongPass123!');
         userToken = await getAuthToken('user@example.com', 'StrongPass123!', 'user');
+        userInactiveToken = await getAuthToken('userInactive_getId@example.com', 'StrongPass123!', 'user', true);
 
         userToUpdate = await getOne('user@example.com');
+        userInactive = await getOne('userInactive_getId@example.com');
     });
 
     it('Should allow admin to update another user', async () => {
@@ -433,6 +525,24 @@ describe('User: Update user', () => {
 
         expect(res.status).toBe(404);
         expect(res.body.errors[0].message).toBe(MESSAGES.ERROR.USER.NOT_FOUND);
+    });
+
+    it('should not allow update user if user is inactive', async () => {
+
+        await request(app)
+            .patch(`/api/users/${userInactive?._id}/deactivate`)
+            .set('Authorization', `Bearer ${adminToken}`);
+
+        const res = await request(app)
+            .put(`/api/users/${userInactive?._id}`)
+            .set('Authorization', `Bearer ${userInactiveToken}`)
+            .send({ name: 'Ghost' });
+
+        const updatedUser = await getOne(userInactive.email);
+
+        expect(res.status).toBe(403);
+        expect(res.body.errors[0].message).toBe(MESSAGES.ERROR.AUTH.USER_INACTIVE);
+        expect(updatedUser?.isActive).toBe(false);
     });
 });
 
@@ -545,17 +655,21 @@ describe('User: Reset Password', () => {
 describe('User: Get by ID', () => {
     let adminToken: string;
     let userToken: string;
+    let userInactiveToken: string;
     let admin: IUser | any;
     let user: IUser | any;
+    let userInactive: IUser | any;
 
     beforeEach(async () => {
         await UserModel.deleteMany({});
 
         adminToken = await getAuthToken('admin_getId@example.com', 'StrongPass123!');
         userToken = await getAuthToken('user_getId@example.com', 'StrongPass123!', 'user');
+        userInactiveToken = await getAuthToken('userInactive_getId@example.com', 'StrongPass123!', 'user', true);
 
         admin = await getOne('admin_getId@example.com');
         user = await getOne('user_getId@example.com');
+        userInactive = await getOne('userInactive_getId@example.com');
     });
 
     it('should allow admin to get any user', async () => {
@@ -597,19 +711,45 @@ describe('User: Get by ID', () => {
         expect(res.status).toBe(404);
         expect(res.body.errors[0].message).toBe(MESSAGES.ERROR.USER.NOT_FOUND);
     });
+
+    it('should not allow get user by id if user is inactive', async () => {
+
+        await request(app)
+            .patch(`/api/users/${userInactive?._id}/deactivate`)
+            .set('Authorization', `Bearer ${adminToken}`);
+
+        const res = await request(app)
+            .get(`/api/users/${userInactive._id}`)
+            .set('Authorization', `Bearer ${userInactiveToken}`);
+
+        const updatedUser = await getOne(userInactive.email);
+
+        expect(res.status).toBe(403);
+        expect(res.body.errors[0].message).toBe(MESSAGES.ERROR.AUTH.USER_INACTIVE);
+        expect(updatedUser?.isActive).toBe(false);
+    });
 });
 
 describe('User: Deactivate (soft delete)', () => {
     let adminToken: string;
     let userToken: string;
+    let userInactiveToken: string;
+    let otherAdminToken: string;
     let user: IUser | null;
+    let userInactive: IUser | null;
+    let otherUser: IUser | null;
 
     beforeEach(async () => {
         await UserModel.deleteMany({});
         adminToken = await getAuthToken('admin_getId@example.com', 'StrongPass123!');
         userToken = await getAuthToken('user_getId@example.com', 'StrongPass123!', 'user');
+        otherAdminToken = await getAuthToken('userAdmin_getId@example.com', 'StrongPass123!', 'admin');
+
+        userInactiveToken = await getAuthToken('userInactive_getId@example.com', 'StrongPass123!', 'user', true);
 
         user = await getOne('user_getId@example.com');
+        userInactive = await getOne('userInactive_getId@example.com');
+        otherUser = await getOne('userAdmin_getId@example.com');
     });
 
     it('should deactivate user as admin', async () => {
@@ -645,19 +785,46 @@ describe('User: Deactivate (soft delete)', () => {
         expect(res.status).toBe(404);
         expect(res.body.errors[0].message).toBe(MESSAGES.ERROR.USER.NOT_FOUND);
     });
+
+    it('should not allow deactivate user if user is inactive', async () => {
+
+        await request(app)
+            .patch(`/api/users/${otherUser?._id}/deactivate`)
+            .set('Authorization', `Bearer ${adminToken}`);
+
+        const res = await request(app)
+            .patch(`/api/users/${userInactive?._id}/deactivate`)
+            .set('Authorization', `Bearer ${otherAdminToken}`);
+
+        const updatedUser = await getOne(otherUser?.email);
+
+        expect(res.status).toBe(403);
+        expect(res.body.errors[0].message).toBe(MESSAGES.ERROR.AUTH.USER_INACTIVE);
+        expect(updatedUser?.isActive).toBe(false);
+    });
 });
 
 describe('User: Activate user', () => {
     let adminToken: string;
     let userToken: string;
+    let userInactiveToken: string;
+    let otherAdminToken: string;
     let user: IUser | null;
+    let userInactive: IUser | null;
+    let otherUser: IUser | null;
 
     beforeEach(async () => {
         await UserModel.deleteMany({});
         adminToken = await getAuthToken('admin_getId@example.com', 'StrongPass123!');
         userToken = await getAuthToken('user_getId@example.com', 'StrongPass123!', 'user');
 
+        otherAdminToken = await getAuthToken('userAdmin_getId@example.com', 'StrongPass123!', 'admin');
+
+        userInactiveToken = await getAuthToken('userInactive_getId@example.com', 'StrongPass123!', 'user', true);
+
         user = await getOne('user_getId@example.com');
+        userInactive = await getOne('userInactive_getId@example.com');
+        otherUser = await getOne('userAdmin_getId@example.com');
     });
 
     it('should activate user as admin', async () => {
@@ -696,5 +863,22 @@ describe('User: Activate user', () => {
 
         expect(res.status).toBe(404);
         expect(res.body.errors[0].message).toBe(MESSAGES.ERROR.USER.NOT_FOUND);
+    });
+
+    it('should not allow activate user if user is inactive', async () => {
+
+        await request(app)
+            .patch(`/api/users/${otherUser?._id}/deactivate`)
+            .set('Authorization', `Bearer ${adminToken}`);
+
+        const res = await request(app)
+            .patch(`/api/users/${userInactive?._id}/activate`)
+            .set('Authorization', `Bearer ${otherAdminToken}`);
+
+        const updatedUser = await getOne(otherUser?.email);
+
+        expect(res.status).toBe(403);
+        expect(res.body.errors[0].message).toBe(MESSAGES.ERROR.AUTH.USER_INACTIVE);
+        expect(updatedUser?.isActive).toBe(false);
     });
 });
