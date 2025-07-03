@@ -18,7 +18,8 @@ export const MESSAGES = {
             SEND_FAILED: 'Failed to send email. Please try again later.',
             EMAIL_NOT_VERIFIED: 'You must verify your email before logging in.',
             ALREADY_VERIFIED: 'This email is already verified.',
-            INVALID_OR_EXPIRED_TOKEN: 'Invalid or expired reset token.'
+            INVALID_OR_EXPIRED_TOKEN: 'Invalid or expired reset token.',
+            USER_INACTIVE: 'User inactive.',
         },
         AUTHORIZATION: {
             FORBIDDEN: 'You do not have permission to access this resource.',

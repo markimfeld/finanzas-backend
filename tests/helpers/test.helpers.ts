@@ -32,9 +32,9 @@ export async function createTestUser(overrides: Partial<{
     return { user, plainPassword: password }
 }
 
-export async function getAuthToken(email = 'test@example.com', password = 'StrongPass123!', role = 'admin') {
+export async function getAuthToken(email = 'test@example.com', password = 'StrongPass123!', role = 'admin', isActive = true) {
     // Asegurate de que exista el usuario
-    await createTestUser({ email, password: password, emailVerified: true, role });
+    await createTestUser({ email, password: password, emailVerified: true, role, isActive });
 
     const res = await request(app)
         .post('/api/auth/login')

@@ -15,13 +15,14 @@ import { authMiddleware } from "../middlewares/auth.middleware";
 import { changePasswordSchema } from "../validations/changePassword.schema";
 import { resetPasswordSchema } from "../validations/resetPassword.schema";
 import { ResendVerificationEmailSchema } from "../dtos/resendVerificationEmail.dto";
+import { checkUserIsActive } from "../middlewares/checkUserIsActive";
 
 const router = express.Router();
 
 router.post("/login", validateZod(loginSchema), login);
-router.post("/change-password", authMiddleware, validateZod(changePasswordSchema), changePassword)
-router.post("/logout", authMiddleware, logout);
-router.post("/refresh-token", refreshAccessToken);
+router.post("/change-password", authMiddleware, validateZod(changePasswordSchema), checkUserIsActive, changePassword)
+router.post("/logout", authMiddleware, checkUserIsActive, logout);
+router.post("/refresh-token", authMiddleware, checkUserIsActive, refreshAccessToken);
 router.get('/verify-email/:token', verifyEmail);
 router.post('/resend-verification', validateZod(ResendVerificationEmailSchema), resendVerificationEmail);
 router.post('/forgot-password', forgotPassword);
