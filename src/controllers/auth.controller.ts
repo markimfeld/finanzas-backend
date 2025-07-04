@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
 // services
-import { userService } from "../services";
+import { auditService, userService } from "../services";
 // dto
 import { AuthResponseDTO } from "../dtos/auth.dto";
 // messages
@@ -14,6 +14,8 @@ import { BadRequestError, UnauthorizedError } from "../errors";
 // interfaces
 import { JwtPayload } from "../interfaces/auth/jwtPayload.interface";
 import { IUserRole } from "../interfaces/common/roles.interface";
+// audit
+import { AuditLogModel } from "../models/auditLog.model";
 
 export const login = async (
     req: Request,
@@ -29,12 +31,26 @@ export const login = async (
 
         user.refreshToken = refreshToken;
 
+        // 🔍 Auditamos el login exitoso
+        auditService.log({
+            userId: user._id,
+            action: 'login',
+            method: req.method,
+            path: req.originalUrl
+        })
+
         res.status(200).json({
             success: true,
             data: AuthResponseDTO.from(user, access_token),
             message: MESSAGES.SUCCESS.USER.LOGGED_IN,
         });
     } catch (err) {
+        auditService.log({
+            userId: undefined,
+            action: 'login',
+            method: req.method,
+            path: req.originalUrl
+        })
         next(err);
     }
 };

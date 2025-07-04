@@ -1,5 +1,5 @@
-import { UserModel, UserDocument } from '../../models/user.model';
-import { IUser, IUserRepository } from '../../interfaces/repositories/user.repository.interface';
+import { UserModel, UserDocument } from '../../../models/user.model';
+import { IUser, IUserRepository } from '../../../interfaces/repositories/user.repository.interface';
 
 export class UserRepositoryMongo implements IUserRepository {
 
