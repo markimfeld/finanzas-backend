@@ -5,24 +5,24 @@ jest.mock('../../src/utils/email.util', () => ({
 }));
 import request from 'supertest';
 import app from '../../src/app';
-import { connectToDatabase, disconnectToDatabase } from '../../src/config/database';
 import { UserModel } from '../../src/models/user.model';
 import { createTestUser, getAuthToken, getOne } from '../helpers/test.helpers';
 import { MESSAGES } from '../../src/constants/messages';
 import { IUser } from '../../src/interfaces/repositories/user.repository.interface';
 import Hasher from '../../src/utils/hash.util';
+import { setupMemoryMongoDB, teardownMemoryMongoDB } from '../setup';
 
 jest.setTimeout(15000);
 
 const hasher = Hasher.getInstance();
 
 beforeAll(async () => {
-    await connectToDatabase();
+    await setupMemoryMongoDB();
 });
 
 afterAll(async () => {
     await UserModel.deleteMany({});
-    await disconnectToDatabase();
+    await teardownMemoryMongoDB();
 });
 
 describe('User: Login', () => {
@@ -195,6 +195,10 @@ describe('User: Change Password', () => {
         userInactiveToken = await getAuthToken('userInactive_getId@example.com', 'StrongPass123!', 'user', true);
 
         userInactive = await getOne('userInactive_getId@example.com');
+    });
+
+    afterEach(() => {
+        jest.resetAllMocks();
     });
 
     it('Should change password successfully', async () => {

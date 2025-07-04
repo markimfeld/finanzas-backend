@@ -33,7 +33,7 @@ Permitido para uno mismo o admin.
 Marcar un usuario como inactivo en vez de borrarlo.
 Útil si no querés perder registros históricos.
 
-- [ ] 📊 Auditoría (a futuro)
+- [x] 📊 Auditoría (a futuro)
 Registrar qué usuario hizo qué acción (crear, editar, etc.).
 Puede hacerse con middleware que loguea la actividad.
 
