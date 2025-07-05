@@ -886,3 +886,69 @@ describe('User: Activate user', () => {
         expect(updatedUser?.isActive).toBe(false);
     });
 });
+
+describe('User: Update profile', () => {
+    let adminToken: string;
+    let userToken: string;
+    let userInactiveToken: string;
+    let userToUpdate: IUser | null;
+    let userInactive: IUser | any;
+
+    beforeEach(async () => {
+        await UserModel.deleteMany({});
+
+        adminToken = await getAuthToken('admin@example.com', 'StrongPass123!');
+        userToken = await getAuthToken('user@example.com', 'StrongPass123!', 'user');
+        userInactiveToken = await getAuthToken('userInactive_getId@example.com', 'StrongPass123!', 'user', true);
+
+        userToUpdate = await getOne('user@example.com');
+        userInactive = await getOne('userInactive_getId@example.com');
+    });
+
+    it('Should allow user admin to update his own profile', async () => {
+        const res = await request(app)
+            .put(`/api/users`)
+            .set('Authorization', `Bearer ${adminToken}`)
+            .send({ name: 'Admin Name' });
+
+        expect(res.status).toBe(200);
+        expect(res.body.data.name).toBe('Admin Name');
+    });
+
+    it('Should allow user normal to update his own profile', async () => {
+        const res = await request(app)
+            .put(`/api/users`)
+            .set('Authorization', `Bearer ${userToken}`)
+            .send({ name: 'User Name' });
+
+        expect(res.status).toBe(200);
+        expect(res.body.data.name).toBe('User Name');
+    });
+
+    it('Should fail if no token is provided', async () => {
+        const res = await request(app)
+            .put(`/api/users`)
+            .send({ name: 'Anonymous Update' });
+
+        expect(res.status).toBe(401);
+        expect(res.body).toHaveProperty('errors');
+    });
+
+    it('should not allow update user if user is inactive', async () => {
+
+        await request(app)
+            .patch(`/api/users/${userInactive?._id}/deactivate`)
+            .set('Authorization', `Bearer ${adminToken}`);
+
+        const res = await request(app)
+            .put(`/api/users`)
+            .set('Authorization', `Bearer ${userInactiveToken}`)
+            .send({ name: 'Ghost' });
+
+        const updatedUser = await getOne(userInactive.email);
+
+        expect(res.status).toBe(403);
+        expect(res.body.errors[0].message).toBe(MESSAGES.ERROR.AUTH.USER_INACTIVE);
+        expect(updatedUser?.isActive).toBe(false);
+    });
+});

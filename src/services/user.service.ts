@@ -236,4 +236,23 @@ export class UserService {
 
         return updatedUser;
     }
+
+    async updateUserProfile(userId: string, data: Partial<IUser>): Promise<IUser> {
+        // const allowedFields = ['name', 'avatar', 'bio'];
+        // const updateData: Partial<IUser> = {};
+
+        // for (const field of allowedFields) {
+        //     if (field in data) {
+        //         updateData[field] = data[field];
+        //     }
+        // }
+        const updatedUser = await this.userRepository.updateUser(userId, data);
+
+        if (!updatedUser) {
+            throw new NotFoundError(MESSAGES.ERROR.USER.NOT_FOUND);
+        }
+
+        // return this.userRepository.updateById(userId, updateData);
+        return updatedUser;
+    }
 }
