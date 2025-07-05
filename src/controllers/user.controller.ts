@@ -175,3 +175,19 @@ export const activateUser = async (
         next(error);
     }
 };
+
+export const updateProfile = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const userId = req.user?.userId!;
+        const updatedUser = await userService.updateUserProfile(userId, req.body);
+        const safeUser = UserDTO.from(updatedUser);
+
+        res.status(200).json({
+            success: true,
+            data: safeUser,
+            message: MESSAGES.SUCCESS.USER.UPDATED
+        })
+    } catch (error) {
+        next(error);
+    }
+};
