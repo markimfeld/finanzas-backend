@@ -11,38 +11,48 @@
 - [x] Tipado estricto (interfaces, types, DTOs).
 - [x] Mensajes centralizados en messages.ts.
 - [x] Manejo de errores customizados (HttpError, BadRequestError, etc.).
-
-
-# 🧠 Sugerencias para completar/fortalecer módulo de usuarios:
-- [x] 🔐 Cambiar contraseña (Change Password)
-Ruta protegida.
-Requiere contraseña actual + nueva.
-Solo el propio usuario puede hacerlo.
-Validar fuerza de la contraseña.
-
-- [x] 📤 Olvidé mi contraseña / Reset Password (opcional)
-Envío de token temporal por email.
-Flujo de actualización de contraseña con token.
-Requiere integración con email, pero es muy común.
-
-- [x] 👁️ Get user by ID (detalles de usuario individual)
-Permitido para uno mismo o admin.
-Útil si tenés un perfil de usuario detallado.
-
-- [x] 🧼 Soft delete / desactivar usuario (opcional)
-Marcar un usuario como inactivo en vez de borrarlo.
-Útil si no querés perder registros históricos.
-
-- [x] 📊 Auditoría (a futuro)
-Registrar qué usuario hizo qué acción (crear, editar, etc.).
-Puede hacerse con middleware que loguea la actividad.
-
-- [ ] ⚙️ Actualizar configuración de perfil (avatar, bio, etc.)
-Si tu app tiene información adicional del usuario, podés permitir editar esos datos desde un endpoint de perfil.
-
+- [x] Cambiar contraseña.
+- [x] Olvidé mi contraseña.
+- [x] Obtener user by ID.
+- [x] Desactivar usuario.
+- [x] Auditoría.
+- [x] Actualizar configuración de perfil (avatar, bio, etc.).
 
 # 🧪 Otros detalles a considerar
 ### Tests unitarios e integración (ideal para services y rutas críticas como login).
 ### Rate limiting en login para evitar fuerza bruta.
 ### Bloqueo de cuenta tras varios intentos fallidos (opcional, si buscás seguridad avanzada).
 ### Verificación de email (si tu sistema lo requiere).
+
+
+# 🧾 Módulo: Presupuestos (budgets)
+
+## ✅ Funcionalidades básicas
+
+- [] Crear presupuesto.
+Monto total.
+Categoría.
+Fecha de inicio y fin.
+Asociado a usuario autenticado.
+
+- [] Obtener todos los presupuestos del usuario
+Listado paginado.
+Filtros por categoría, fechas, etc. (opcional).
+
+- [] Obtener un presupuesto específico por ID
+Solo si pertenece al usuario autenticado.
+
+- [] Actualizar presupuesto
+Editar monto, categoría o fechas.
+Validaciones necesarias (fechas válidas, montos positivos, etc.).
+
+- [] Eliminar presupuesto
+Eliminación lógica (soft delete) o física según decisión del sistema.
+
+- [] Validaciones de negocio
+Fechas coherentes (startDate < endDate)
+No permitir presupuestos superpuestos en misma categoría y período (opcional).
+Monto mayor a cero.
+
+- [] Autorización
+Solo el usuario dueño del presupuesto puede ver, editar o eliminar.
