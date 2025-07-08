@@ -29,30 +29,30 @@
 
 ## ✅ Funcionalidades básicas
 
-- [] Crear presupuesto.
+- [ ] Crear presupuesto.
 Monto total.
 Categoría.
 Fecha de inicio y fin.
 Asociado a usuario autenticado.
 
-- [] Obtener todos los presupuestos del usuario
+- [ ] Obtener todos los presupuestos del usuario
 Listado paginado.
 Filtros por categoría, fechas, etc. (opcional).
 
-- [] Obtener un presupuesto específico por ID
+- [ ] Obtener un presupuesto específico por ID
 Solo si pertenece al usuario autenticado.
 
-- [] Actualizar presupuesto
+- [ ] Actualizar presupuesto
 Editar monto, categoría o fechas.
 Validaciones necesarias (fechas válidas, montos positivos, etc.).
 
-- [] Eliminar presupuesto
+- [ ] Eliminar presupuesto
 Eliminación lógica (soft delete) o física según decisión del sistema.
 
-- [] Validaciones de negocio
+- [ ] Validaciones de negocio
 Fechas coherentes (startDate < endDate)
 No permitir presupuestos superpuestos en misma categoría y período (opcional).
 Monto mayor a cero.
 
-- [] Autorización
+- [ ] Autorización
 Solo el usuario dueño del presupuesto puede ver, editar o eliminar.
