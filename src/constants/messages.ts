@@ -29,8 +29,14 @@ export const MESSAGES = {
         GENERAL: {
             INTERNAL_SERVER: "Something went wrong. Please try again later.",
         },
+        BUDGET: {
+            DUPLICATE_BUDGET: "Duplicate budget.",
+        }
     },
     VALIDATION: {
+        GENERAL: {
+            INVALID_OBJECT_ID: "Invalid ObjectId format."
+        },
         USER: {
             NAME_REQUIRED: "Name is required.",
             EMAIL_REQUIRED: "Email is required.",
@@ -40,6 +46,18 @@ export const MESSAGES = {
             INVALID_ROLE: "Invalid role. Allowed roles are: admin, user, viewer.",
             PASSWORD_WEAK: "Password must include uppercase, lowercase, number, and special character."
         },
+        BUDGET: {
+            START_DATE_MUST_BE_BEFORE_END_DATE: "Start date must be before end date.",
+            AMOUNT_REQUIRED: "Amount is required.",
+            AMOUNT_MUST_BE_POSITIVE: "Amount must be positive.",
+            START_DATE_REQUIRED: "Start date is required.",
+            START_END_REQUIRED: "End date is required.",
+            BUDGET_ALREADY_EXISTS: "A budget already exists for this category and date range."
+        },
+        CATEGORY: {
+            NOT_FOUND: 'Category not found.',
+            NAME: 'Name is required.'
+        }
     },
     SUCCESS: {
         USER: {
@@ -56,6 +74,12 @@ export const MESSAGES = {
             EMAIL_VERIFIED: "Email successfully verified.",
             VERIFICATION_EMAIL_RESENT: 'Verification email resent successfully.',
             RESET_EMAIL_SENT: 'Reset email sent successfully.'
+        },
+        CATEGORY: {
+            CREATED: "Category created successfully."
+        },
+        BUDGET: {
+            CREATED: "Budget created successfully."
         }
     },
 };
