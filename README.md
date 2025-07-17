@@ -39,7 +39,7 @@
       Fecha de inicio y fin.
       Asociado a usuario autenticado.
 
-- [ ] Obtener todos los presupuestos del usuario
+- [x] Obtener todos los presupuestos del usuario
       Listado paginado.
       Filtros por categoría, fechas, etc. (opcional).
 
