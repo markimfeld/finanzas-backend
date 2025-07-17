@@ -1,20 +1,25 @@
-import { Request, Response, NextFunction } from 'express';
-import { ZodSchema } from 'zod';
-import { BadRequestError } from '../errors';
+import { Request, Response, NextFunction } from "express";
+import { ZodSchema } from "zod";
+import { BadRequestError } from "../errors";
 
-export const validateZod = (schema: ZodSchema<any>) => (req: Request, res: Response, next: NextFunction) => {
-  const result = schema.safeParse(req.body);
+export const validateZod =
+  (schema: ZodSchema<any>, source: "body" | "query" | "params" = "body") =>
+  (req: Request, res: Response, next: NextFunction) => {
+    const dataToValidate = req[source];
+    const result = schema.safeParse(dataToValidate);
 
-  if (!result.success) {
-    const errors = result.error.errors.map(err => ({
-      field: err.path.join('.'),
-      message: err.message,
-    }));
-    throw new BadRequestError('Validation failed', errors);
-  }
+    if (!result.success) {
+      const errors = result.error.errors.map((err) => ({
+        field: err.path.join("."),
+        message: err.message,
+      }));
+      throw new BadRequestError("Validation failed", errors);
+    }
 
-  // Si la validación fue exitosa, opcionalmente podés guardar los datos limpios en req.body:
-  req.body = result.data;
+    // Guardar en un nuevo campo del request para no romper nada
+    (req as any)[`validated${capitalize(source)}`] = result.data;
 
-  next();
-};
+    next();
+  };
+
+const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);

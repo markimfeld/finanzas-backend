@@ -1,6 +1,7 @@
 # App de finanzas
 
-# ✅ Ya implementado (muy bien estructurado): 
+# ✅ Ya implementado (muy bien estructurado):
+
 - [x] Creación de usuarios con validación Zod + DTO.
 - [x] Login con generación de JWT + Refresh Token.
 - [x] Logout con invalidación segura.
@@ -19,40 +20,43 @@
 - [x] Actualizar configuración de perfil (avatar, bio, etc.).
 
 # 🧪 Otros detalles a considerar
-### Tests unitarios e integración (ideal para services y rutas críticas como login).
-### Rate limiting en login para evitar fuerza bruta.
-### Bloqueo de cuenta tras varios intentos fallidos (opcional, si buscás seguridad avanzada).
-### Verificación de email (si tu sistema lo requiere).
 
+### Tests unitarios e integración (ideal para services y rutas críticas como login).
+
+### Rate limiting en login para evitar fuerza bruta.
+
+### Bloqueo de cuenta tras varios intentos fallidos (opcional, si buscás seguridad avanzada).
+
+### Verificación de email (si tu sistema lo requiere).
 
 # 🧾 Módulo: Presupuestos (budgets)
 
 ## ✅ Funcionalidades básicas
 
-- [ ] Crear presupuesto.
-Monto total.
-Categoría.
-Fecha de inicio y fin.
-Asociado a usuario autenticado.
+- [x] Crear presupuesto.
+      Monto total.
+      Categoría.
+      Fecha de inicio y fin.
+      Asociado a usuario autenticado.
 
 - [ ] Obtener todos los presupuestos del usuario
-Listado paginado.
-Filtros por categoría, fechas, etc. (opcional).
+      Listado paginado.
+      Filtros por categoría, fechas, etc. (opcional).
 
 - [ ] Obtener un presupuesto específico por ID
-Solo si pertenece al usuario autenticado.
+      Solo si pertenece al usuario autenticado.
 
 - [ ] Actualizar presupuesto
-Editar monto, categoría o fechas.
-Validaciones necesarias (fechas válidas, montos positivos, etc.).
+      Editar monto, categoría o fechas.
+      Validaciones necesarias (fechas válidas, montos positivos, etc.).
 
 - [ ] Eliminar presupuesto
-Eliminación lógica (soft delete) o física según decisión del sistema.
+      Eliminación lógica (soft delete) o física según decisión del sistema.
 
 - [ ] Validaciones de negocio
-Fechas coherentes (startDate < endDate)
-No permitir presupuestos superpuestos en misma categoría y período (opcional).
-Monto mayor a cero.
+      Fechas coherentes (startDate < endDate)
+      No permitir presupuestos superpuestos en misma categoría y período (opcional).
+      Monto mayor a cero.
 
 - [ ] Autorización
-Solo el usuario dueño del presupuesto puede ver, editar o eliminar.
+      Solo el usuario dueño del presupuesto puede ver, editar o eliminar.
