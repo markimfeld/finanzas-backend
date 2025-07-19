@@ -8,6 +8,7 @@ import { MESSAGES } from "../constants/messages";
 // dtos
 import { CreateBudgetDto } from "../dtos/createBudget.dto";
 import { GetBudgetsDto } from "../dtos/getBudgets.dto";
+import { BudgetDTO } from "../dtos/budget.dto";
 
 export const createBudget = async (
   req: Request<{}, {}, CreateBudgetDto>,
@@ -50,6 +51,32 @@ export const getAllUsers = async (
 
     const result = await budgetService.getBudgets(dto, userId);
     res.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getBudgetById = async (
+  req: Request<{ id: string }>,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const requestedId = req.params.id;
+    const authenticatedUser = req.user!;
+
+    const budget = await budgetService.getBudgetById(requestedId);
+
+    if (budget.userId.toString() !== authenticatedUser.userId) {
+      throw new ForbiddenError(MESSAGES.ERROR.AUTHORIZATION.FORBIDDEN);
+    }
+
+    const safeBudget = BudgetDTO.from(budget);
+
+    res.status(200).json({
+      success: true,
+      data: safeBudget,
+    });
   } catch (error) {
     next(error);
   }
