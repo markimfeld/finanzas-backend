@@ -43,7 +43,7 @@
       Listado paginado.
       Filtros por categoría, fechas, etc. (opcional).
 
-- [ ] Obtener un presupuesto específico por ID
+- [x] Obtener un presupuesto específico por ID
       Solo si pertenece al usuario autenticado.
 
 - [ ] Actualizar presupuesto

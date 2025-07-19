@@ -1,5 +1,9 @@
 import { Router } from "express";
-import { createBudget, getAllUsers } from "../controllers/budget.controller";
+import {
+  createBudget,
+  getAllUsers,
+  getBudgetById,
+} from "../controllers/budget.controller";
 import { authMiddleware } from "../middlewares/auth.middleware";
 import { validateZod } from "../middlewares/validateZod";
 import { createBudgetSchema } from "../validations/createBudget.schema";
@@ -27,6 +31,14 @@ router.get(
   checkUserIsActive,
   auditMiddleware("get_all_budgets"),
   getAllUsers
+);
+router.get(
+  "/:id",
+  authMiddleware,
+  authorize("budgets.read"),
+  checkUserIsActive,
+  auditMiddleware("get_budget"),
+  getBudgetById
 );
 
 export default router;

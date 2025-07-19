@@ -78,4 +78,14 @@ export class BudgetService {
       },
     };
   }
+
+  async getBudgetById(budgetId: string): Promise<IBudget> {
+    const budget = await this.budgetRepository.findById(budgetId);
+
+    if (!budget) {
+      throw new NotFoundError(MESSAGES.ERROR.BUDGET.NOT_FOUNTD);
+    }
+
+    return budget;
+  }
 }

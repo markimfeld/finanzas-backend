@@ -7,7 +7,7 @@ import app from "../../src/app";
 import { UserModel } from "../../src/models/user.model";
 import { AuditLogModel } from "../../src/models/auditLog.model";
 import { CategoryModel, ICategory } from "../../src/models/category.model";
-import { getAuthToken, getOne } from "../helpers/test.helpers";
+import { getAuthToken, getOne, getOneBudget } from "../helpers/test.helpers";
 import { setupMemoryMongoDB, teardownMemoryMongoDB } from "../setup";
 import { BudgetModel } from "../../src/models/budget.model";
 import { MESSAGES } from "../../src/constants/messages";
@@ -147,6 +147,7 @@ describe("Budget: create budget", () => {
 
 describe("Budget: get budgets", () => {
   let access_token: string;
+  let another_access_token: string;
   let user: IUser | null;
   let category_1: ICategory;
   let category_2: ICategory;
@@ -161,7 +162,10 @@ describe("Budget: get budgets", () => {
       "get_budgets@example.com",
       "StrongPass123!"
     );
-    await getAuthToken("another_user_budget@example.com", "StrongPass123!");
+    another_access_token = await getAuthToken(
+      "another_user_budget@example.com",
+      "StrongPass123!"
+    );
     user = await getOne("get_budgets@example.com");
     anotherUser = await getOne("another_user_budget@example.com");
 
@@ -284,5 +288,65 @@ describe("Budget: get budgets", () => {
   it("should return 401 if no token is provided.", async () => {
     const res = await request(app).get("/api/budgets?page=1&limit=10");
     expect(res.status).toBe(401);
+  });
+
+  it("should return a budget by id.", async () => {
+    await BudgetModel.create([
+      {
+        amount: 100,
+        userId: user?._id,
+        category: category_1._id,
+        startDate: new Date("2025-01-01"),
+        endDate: new Date("2025-01-31"),
+      },
+      {
+        amount: 200,
+        userId: user?._id,
+        category: category_2._id,
+        startDate: new Date("2025-03-01"),
+        endDate: new Date("2025-03-31"),
+      },
+    ]);
+
+    const budget = await getOneBudget(100);
+
+    const res = await request(app)
+      .get(`/api/budgets/${budget?._id}`)
+      .set("Authorization", `Bearer ${access_token}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveProperty("success");
+    expect(res.body.success).toBe(true);
+    expect(res.body).toHaveProperty("data");
+    expect(res.body.data).toHaveProperty("amount");
+    expect(res.body.data.amount).toBe(100);
+    expect(res.body.data.category).toBe(category_1._id.toString());
+  });
+
+  it("should not return a budget if it doesnt belong to the user.", async () => {
+    await BudgetModel.create([
+      {
+        amount: 100,
+        userId: user?._id,
+        category: category_1._id,
+        startDate: new Date("2025-01-01"),
+        endDate: new Date("2025-01-31"),
+      },
+      {
+        amount: 200,
+        userId: user?._id,
+        category: category_2._id,
+        startDate: new Date("2025-03-01"),
+        endDate: new Date("2025-03-31"),
+      },
+    ]);
+
+    const budget = await getOneBudget(100);
+
+    const res = await request(app)
+      .get(`/api/budgets/${budget?._id}`)
+      .set("Authorization", `Bearer ${another_access_token}`);
+
+    expect(res.status).toBe(403);
   });
 });
