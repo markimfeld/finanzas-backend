@@ -10,4 +10,5 @@ export interface IBudgetRepository {
   findAll(): Promise<IBudget[]>;
   findByFilters(dto: GetBudgetsDto, userId: string): Promise<IBudget[]>;
   countByFilters(dto: GetBudgetsDto, userId: string): Promise<number>;
+  updateBudget(id: string, data: Partial<IBudget>): Promise<IBudget | null>;
 }

@@ -9,7 +9,7 @@ import { AuditLogModel } from "../../src/models/auditLog.model";
 import { CategoryModel, ICategory } from "../../src/models/category.model";
 import { getAuthToken, getOne, getOneBudget } from "../helpers/test.helpers";
 import { setupMemoryMongoDB, teardownMemoryMongoDB } from "../setup";
-import { BudgetModel } from "../../src/models/budget.model";
+import { BudgetModel, IBudget } from "../../src/models/budget.model";
 import { MESSAGES } from "../../src/constants/messages";
 import { IUser } from "../../src/interfaces/repositories/user.repository.interface";
 
@@ -348,5 +348,147 @@ describe("Budget: get budgets", () => {
       .set("Authorization", `Bearer ${another_access_token}`);
 
     expect(res.status).toBe(403);
+  });
+});
+
+describe("Budget: update budget", () => {
+  let access_token: string;
+  let another_access_token: string;
+  let user: IUser | null;
+  let anotherUser: IUser | null;
+  let category_1: ICategory | null;
+  let category_2: ICategory | null;
+  let budgetToUpdate: IBudget | null;
+  let anotherBudgetToUpdate: IBudget | null;
+  let budgetToUpdateOtherUser: IBudget | null;
+  let budgetStartDateWrong: IBudget | null;
+
+  beforeEach(async () => {
+    await UserModel.deleteMany({});
+    await AuditLogModel.deleteMany({});
+    await CategoryModel.deleteMany({});
+    await BudgetModel.deleteMany({});
+    access_token = await getAuthToken(
+      "update_budget@example.com",
+      "StrongPass123!"
+    );
+    another_access_token = await getAuthToken(
+      "another_user_budget@example.com",
+      "StrongPass123!"
+    );
+    user = await getOne("update_budget@example.com");
+    anotherUser = await getOne("another_user_budget@example.com");
+
+    category_1 = await CategoryModel.create({
+      name: "Category 1",
+      userId: user?._id,
+    });
+    category_2 = await CategoryModel.create({
+      name: "Category 2",
+      userId: anotherUser?._id,
+    });
+    budgetToUpdate = await BudgetModel.create({
+      amount: 50,
+      userId: user?._id,
+      category: category_1._id,
+      startDate: "2025-07-01",
+      endDate: "2025-07-31",
+    });
+    anotherBudgetToUpdate = await BudgetModel.create({
+      amount: 50,
+      userId: user?._id,
+      category: "6873c347d12cb481cc4de0f6",
+      startDate: "2025-07-01",
+      endDate: "2025-07-31",
+    });
+    budgetToUpdateOtherUser = await BudgetModel.create({
+      amount: 50,
+      userId: anotherUser?._id,
+      category: category_2._id,
+      startDate: "2025-07-01",
+      endDate: "2025-07-31",
+    });
+    budgetStartDateWrong = await BudgetModel.create({
+      amount: 50,
+      userId: user?._id,
+      category: category_1._id,
+      startDate: "2025-07-01",
+      endDate: "2025-07-31",
+    });
+  });
+
+  it("should update a budget by id.", async () => {
+    const res = await request(app)
+      .put(`/api/budgets/${budgetToUpdate?._id}`)
+      .set("Authorization", `Bearer ${access_token}`)
+      .send({
+        amount: 100,
+      });
+
+    expect(res.status).toBe(200);
+    expect(res.body.data).toHaveProperty("amount");
+    expect(res.body.data.amount).toBe(100);
+  });
+
+  it("should return 401 if access_token is not provided.", async () => {
+    const res = await request(app)
+      .put(`/api/budgets/${budgetToUpdate?._id}`)
+      .send({
+        amount: 100,
+      });
+
+    expect(res.status).toBe(401);
+  });
+
+  it("should return 404 if category is not found", async () => {
+    const res = await request(app)
+      .put(`/api/budgets/${anotherBudgetToUpdate?._id}`)
+      .set("Authorization", `Bearer ${access_token}`)
+      .send({
+        amount: 100,
+        category: "6873c347d12cb481cc4de0f5",
+        startDate: "2025-08-01",
+        endDate: "2025-07-31",
+      });
+
+    expect(res.status).toBe(404);
+  });
+
+  it("should return 403 if category doenst belong to the authenticated user.", async () => {
+    const res = await request(app)
+      .put(`/api/budgets/${budgetToUpdate?._id}`)
+      .set("Authorization", `Bearer ${access_token}`)
+      .send({
+        amount: 100,
+        category: category_2?._id,
+        startDate: "2025-07-01",
+        endDate: "2025-07-31",
+      });
+
+    expect(res.status).toBe(403);
+  });
+
+  it("should return 403 if budget to update doesnt belong to the authenticated user.", async () => {
+    const res = await request(app)
+      .put(`/api/budgets/${budgetToUpdateOtherUser?._id}`)
+      .set("Authorization", `Bearer ${access_token}`)
+      .send({
+        amount: 100,
+      });
+
+    expect(res.status).toBe(403);
+  });
+
+  it("should return 400 if stardDate is greater than endDate.", async () => {
+    const res = await request(app)
+      .put(`/api/budgets/${budgetStartDateWrong?._id}`)
+      .set("Authorization", `Bearer ${access_token}`)
+      .send({
+        category: category_1?._id,
+        startDate: "2025-08-01",
+        endDate: "2025-07-31",
+      });
+
+    expect(res.status).toBe(400);
   });
 });
