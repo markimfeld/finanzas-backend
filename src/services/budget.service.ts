@@ -2,6 +2,7 @@
 import { CreateBudgetDto } from "../dtos/createBudget.dto";
 import { GetBudgetsDto } from "../dtos/getBudgets.dto";
 import { PaginatedResult } from "../dtos/paginatedResult.dto";
+import { UpdateBudgetDto } from "../dtos/updateBudget.dto";
 // model
 import { IBudget } from "../models/budget.model";
 // interfaces
@@ -87,5 +88,76 @@ export class BudgetService {
     }
 
     return budget;
+  }
+
+  async updateBudgetById(
+    userId: string,
+    budgetId: string,
+    budgetData: UpdateBudgetDto
+  ): Promise<IBudget> {
+    if (!budgetData.category && budgetData.startDate && budgetData.endDate) {
+      throw new BadRequestError(
+        MESSAGES.VALIDATION.BUDGET.CATEGORY_MUST_BE_PROVIDED_WHEN_UPDATE_RANGE_DATE
+      );
+    }
+
+    if (budgetData.category && !budgetData.startDate && !budgetData.endDate) {
+      throw new BadRequestError(
+        MESSAGES.VALIDATION.BUDGET.RANGE_DATE_MUST_BE_PROVIDED_WHEN_UPDATING_CATEGORY
+      );
+    }
+
+    if (budgetData.category) {
+      const category = await this.categoryRepository.findById(
+        budgetData.category.toString()
+      );
+
+      if (!category) {
+        throw new NotFoundError(MESSAGES.VALIDATION.CATEGORY.NOT_FOUND);
+      }
+
+      if (category?.userId.toString() !== userId) {
+        throw new ForbiddenError(MESSAGES.ERROR.AUTHORIZATION.FORBIDDEN);
+      }
+
+      const { startDate, endDate } = budgetData;
+
+      if (startDate && endDate) {
+        if (new Date(startDate) >= new Date(endDate)) {
+          throw new BadRequestError(
+            MESSAGES.VALIDATION.BUDGET.START_DATE_MUST_BE_BEFORE_END_DATE
+          );
+        }
+
+        const overlappingBudget = await this.budgetRepository.findOne({
+          _id: { $ne: budgetId },
+          category: budgetData.category,
+          userId,
+          $or: [
+            {
+              startDate: { $lte: budgetData.endDate },
+              endDate: { $gte: budgetData.startDate },
+            },
+          ],
+        });
+
+        if (overlappingBudget) {
+          throw new ConflictError(
+            MESSAGES.VALIDATION.BUDGET.BUDGET_ALREADY_EXISTS
+          );
+        }
+      }
+    }
+
+    const budgetUpdated = await this.budgetRepository.updateBudget(
+      budgetId,
+      budgetData
+    );
+
+    if (!budgetUpdated) {
+      throw new NotFoundError(MESSAGES.ERROR.BUDGET.NOT_FOUNTD);
+    }
+
+    return budgetUpdated;
   }
 }

@@ -57,6 +57,10 @@ export const MESSAGES = {
       START_END_REQUIRED: "End date is required.",
       BUDGET_ALREADY_EXISTS:
         "A budget already exists for this category and date range.",
+      CATEGORY_MUST_BE_PROVIDED_WHEN_UPDATE_RANGE_DATE:
+        "A category must be provided when updating range date.",
+      RANGE_DATE_MUST_BE_PROVIDED_WHEN_UPDATING_CATEGORY:
+        "Range date must be provided when updating category.",
     },
     CATEGORY: {
       NOT_FOUND: "Category not found.",
@@ -84,6 +88,7 @@ export const MESSAGES = {
     },
     BUDGET: {
       CREATED: "Budget created successfully.",
+      UPDATED: "Budget updated successfully.",
     },
   },
 };

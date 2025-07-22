@@ -71,4 +71,11 @@ export class BudgetRepositoryMongo implements IBudgetRepository {
 
     return BudgetModel.countDocuments(filters);
   }
+
+  async updateBudget(
+    id: string,
+    data: Partial<IBudget>
+  ): Promise<IBudget | null> {
+    return await BudgetModel.findByIdAndUpdate(id, data, { new: true });
+  }
 }

@@ -3,6 +3,7 @@ import {
   createBudget,
   getAllUsers,
   getBudgetById,
+  updateBudget,
 } from "../controllers/budget.controller";
 import { authMiddleware } from "../middlewares/auth.middleware";
 import { validateZod } from "../middlewares/validateZod";
@@ -39,6 +40,14 @@ router.get(
   checkUserIsActive,
   auditMiddleware("get_budget"),
   getBudgetById
+);
+router.put(
+  "/:id",
+  authMiddleware,
+  authorize("budgets.update"),
+  checkUserIsActive,
+  auditMiddleware("update_budget"),
+  updateBudget
 );
 
 export default router;

@@ -9,6 +9,7 @@ import { MESSAGES } from "../constants/messages";
 import { CreateBudgetDto } from "../dtos/createBudget.dto";
 import { GetBudgetsDto } from "../dtos/getBudgets.dto";
 import { BudgetDTO } from "../dtos/budget.dto";
+import { UpdateBudgetDto } from "../dtos/updateBudget.dto";
 
 export const createBudget = async (
   req: Request<{}, {}, CreateBudgetDto>,
@@ -76,6 +77,38 @@ export const getBudgetById = async (
     res.status(200).json({
       success: true,
       data: safeBudget,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateBudget = async (
+  req: Request<{ id: string }, {}, UpdateBudgetDto>,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const budgetIdToUpdate = req.params.id;
+    const authenticatedUser = req.user!; // ya está validado por authMiddleware
+
+    const budget = await budgetService.getBudgetById(budgetIdToUpdate);
+    // verifico que el budget que quiero modificar sea del usuario logueado
+    if (budget.userId?.toString() !== authenticatedUser.userId) {
+      throw new ForbiddenError(MESSAGES.ERROR.AUTHORIZATION.FORBIDDEN);
+    }
+
+    const updatedBudget = await budgetService.updateBudgetById(
+      authenticatedUser.userId,
+      budgetIdToUpdate,
+      req.body
+    );
+    const safeBudget = BudgetDTO.from(updatedBudget);
+
+    res.status(200).json({
+      success: true,
+      data: safeBudget,
+      message: MESSAGES.SUCCESS.BUDGET.UPDATED,
     });
   } catch (error) {
     next(error);
