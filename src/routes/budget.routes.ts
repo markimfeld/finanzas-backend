@@ -12,6 +12,7 @@ import { authorize } from "../middlewares/role.middleware";
 import { checkUserIsActive } from "../middlewares/checkUserIsActive";
 import { auditMiddleware } from "../middlewares/audit.middleware";
 import { GetBudgetsDtoSchema } from "../validations/getBudgets.schema";
+import { updateBudgetSchema } from "../validations/updateBudget.schema";
 
 const router = Router();
 
@@ -45,6 +46,7 @@ router.put(
   "/:id",
   authMiddleware,
   authorize("budgets.update"),
+  validateZod(updateBudgetSchema, "body"),
   checkUserIsActive,
   auditMiddleware("update_budget"),
   updateBudget
