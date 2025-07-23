@@ -89,6 +89,7 @@ export const MESSAGES = {
     BUDGET: {
       CREATED: "Budget created successfully.",
       UPDATED: "Budget updated successfully.",
+      DELETED: "Budget deleted successfully.",
     },
   },
 };

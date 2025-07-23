@@ -50,13 +50,13 @@
       Editar monto, categoría o fechas.
       Validaciones necesarias (fechas válidas, montos positivos, etc.).
 
-- [ ] Eliminar presupuesto
+- [x] Eliminar presupuesto
       Eliminación lógica (soft delete) o física según decisión del sistema.
 
-- [ ] Validaciones de negocio
+- [x] Validaciones de negocio
       Fechas coherentes (startDate < endDate)
       No permitir presupuestos superpuestos en misma categoría y período (opcional).
       Monto mayor a cero.
 
-- [ ] Autorización
+- [x] Autorización
       Solo el usuario dueño del presupuesto puede ver, editar o eliminar.

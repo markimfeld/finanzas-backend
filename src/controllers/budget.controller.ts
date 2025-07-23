@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 // services
 import { budgetService } from "../services";
 // errors
-import { ForbiddenError } from "../errors";
+import { BadRequestError, ForbiddenError } from "../errors";
 // messages
 import { MESSAGES } from "../constants/messages";
 // dtos
@@ -109,6 +109,32 @@ export const updateBudget = async (
       success: true,
       data: safeBudget,
       message: MESSAGES.SUCCESS.BUDGET.UPDATED,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteBudgetById = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const userId = req.user?.userId;
+    const { id: budgetId } = req.params;
+
+    if (!userId) {
+      throw new BadRequestError(
+        MESSAGES.ERROR.AUTHORIZATION.USER_NOT_AUTHENTICATED
+      );
+    }
+
+    await budgetService.deleteBudgetById(budgetId, userId);
+
+    res.status(200).json({
+      success: true,
+      message: MESSAGES.SUCCESS.BUDGET.DELETED,
     });
   } catch (error) {
     next(error);

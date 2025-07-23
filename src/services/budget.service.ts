@@ -160,4 +160,15 @@ export class BudgetService {
 
     return budgetUpdated;
   }
+
+  async deleteBudgetById(budgetId: string, userId: string): Promise<void> {
+    // Podés hacer una verificación previa si querés
+    const budget = await this.budgetRepository.findById(budgetId);
+
+    if (!budget || budget.userId.toString() !== userId || budget.isDeleted) {
+      throw new NotFoundError(MESSAGES.ERROR.BUDGET.NOT_FOUNTD);
+    }
+
+    await this.budgetRepository.deleteBudgetById(budgetId, userId);
+  }
 }

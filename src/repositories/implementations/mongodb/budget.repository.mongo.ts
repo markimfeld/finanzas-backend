@@ -17,6 +17,7 @@ export class BudgetRepositoryMongo implements IBudgetRepository {
       endDate,
       createdAt,
       updatedAt,
+      isDeleted,
     } = budget.toObject();
     return {
       _id,
@@ -27,6 +28,7 @@ export class BudgetRepositoryMongo implements IBudgetRepository {
       endDate,
       createdAt,
       updatedAt,
+      isDeleted,
     };
   }
   async findById(budgetId: string): Promise<IBudget | null> {
@@ -77,5 +79,12 @@ export class BudgetRepositoryMongo implements IBudgetRepository {
     data: Partial<IBudget>
   ): Promise<IBudget | null> {
     return await BudgetModel.findByIdAndUpdate(id, data, { new: true });
+  }
+
+  async deleteBudgetById(budgetId: string, userId: string): Promise<void> {
+    await BudgetModel.updateOne(
+      { _id: budgetId, userId, isDeleted: false },
+      { $set: { isDeleted: true } }
+    );
   }
 }

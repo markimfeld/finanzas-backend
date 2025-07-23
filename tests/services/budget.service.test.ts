@@ -492,3 +492,85 @@ describe("Budget: update budget", () => {
     expect(res.status).toBe(400);
   });
 });
+
+describe("Budget: delete budget", () => {
+  let access_token: string;
+  let other_token: string;
+  let user: IUser | null;
+  let category_1: ICategory | null;
+  let budgetToDelete: IBudget | null;
+  let budgetDeleted: IBudget | null;
+
+  beforeEach(async () => {
+    await UserModel.deleteMany({});
+    await AuditLogModel.deleteMany({});
+    await CategoryModel.deleteMany({});
+    await BudgetModel.deleteMany({});
+    access_token = await getAuthToken(
+      "delete_budget@example.com",
+      "StrongPass123!"
+    );
+    other_token = await getAuthToken(
+      "delete_budget_other@example.com",
+      "StrongPass123!"
+    );
+
+    user = await getOne("delete_budget@example.com");
+
+    category_1 = await CategoryModel.create({
+      name: "Category 1",
+      userId: user?._id,
+    });
+
+    budgetToDelete = await BudgetModel.create({
+      amount: 50,
+      userId: user?._id,
+      category: category_1._id,
+      startDate: "2025-07-01",
+      endDate: "2025-07-31",
+    });
+    budgetDeleted = await BudgetModel.create({
+      amount: 50,
+      userId: user?._id,
+      category: category_1._id,
+      startDate: "2025-07-01",
+      endDate: "2025-07-31",
+      isDeleted: true,
+    });
+  });
+
+  it("should delete a budget.", async () => {
+    const res = await request(app)
+      .delete(`/api/budgets/${budgetToDelete?._id}`)
+      .set("Authorization", `Bearer ${access_token}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveProperty("success");
+    expect(res.body.success).toBe(true);
+    expect(res.body).toHaveProperty("message");
+    expect(res.body.message).toBe(MESSAGES.SUCCESS.BUDGET.DELETED);
+
+    const updated = await BudgetModel.findById(budgetToDelete?._id);
+    expect(updated?.isDeleted).toBe(true);
+  });
+
+  it("should not delete a budget of other user.", async () => {
+    const res = await request(app)
+      .delete(`/api/budgets/${budgetToDelete?._id}`)
+      .set("Authorization", `Bearer ${other_token}`);
+
+    expect(res.status).toBe(404);
+    expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
+    expect(res.body.errors[0].message).toBe(MESSAGES.ERROR.BUDGET.NOT_FOUNTD);
+  });
+
+  it("should not delete a budget that is already deleted.", async () => {
+    const res = await request(app)
+      .delete(`/api/budgets/${budgetDeleted?._id}`)
+      .set("Authorization", `Bearer ${access_token}`);
+
+    expect(res.status).toBe(404);
+    expect(res.body.errors.length).toBeGreaterThanOrEqual(1);
+    expect(res.body.errors[0].message).toBe(MESSAGES.ERROR.BUDGET.NOT_FOUNTD);
+  });
+});
