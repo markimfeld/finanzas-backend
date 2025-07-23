@@ -46,7 +46,7 @@
 - [x] Obtener un presupuesto específico por ID
       Solo si pertenece al usuario autenticado.
 
-- [ ] Actualizar presupuesto
+- [x] Actualizar presupuesto
       Editar monto, categoría o fechas.
       Validaciones necesarias (fechas válidas, montos positivos, etc.).
 
