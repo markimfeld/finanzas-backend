@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   createBudget,
+  deleteBudgetById,
   getAllUsers,
   getBudgetById,
   updateBudget,
@@ -50,6 +51,14 @@ router.put(
   checkUserIsActive,
   auditMiddleware("update_budget"),
   updateBudget
+);
+router.delete(
+  "/:id",
+  authMiddleware,
+  authorize("budgets.delete"),
+  checkUserIsActive,
+  auditMiddleware("delete_budget"),
+  deleteBudgetById
 );
 
 export default router;
