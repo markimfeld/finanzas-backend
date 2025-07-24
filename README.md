@@ -60,3 +60,17 @@
 
 - [x] Autorización
       Solo el usuario dueño del presupuesto puede ver, editar o eliminar.
+
+# 🧾 Módulo: Cuentas (accounts)
+
+## ✅ Funcionalidades básicas
+
+- [x] Crear cuenta.
+      name: nombre de la cuenta (ej: "Caja de ahorro", "Cuenta sueldo", "MercadoPago").
+      type: tipo de cuenta (bank, cash, digital_wallet, etc.).
+      balance: número inicial.
+      userId: referencia al usuario dueño.
+
+- [ ] Actualizar cuenta.
+- [ ] Lista cuentas.
+- [ ] Eliminar cuenta.
