@@ -1,0 +1,13 @@
+import { objectIdValidator } from "./objectId.schema";
+import { MESSAGES } from "../constants/messages";
+import { z } from "zod";
+
+export const createAccountSchema = z.object({
+  name: z
+    .string({ required_error: MESSAGES.VALIDATION.ACCOUNT.NAME_REQUIRED })
+    .min(1, { message: MESSAGES.VALIDATION.ACCOUNT.NAME_REQUIRED }),
+  type: z.enum(["bank", "cash", "digital_wallet", "credit_card", "other"]),
+  balance: z
+    .number({ required_error: MESSAGES.VALIDATION.ACCOUNT.BALANCE_REQUIRED })
+    .min(0, { message: MESSAGES.VALIDATION.ACCOUNT.BALANCE_REQUIRED }),
+});

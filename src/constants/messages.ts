@@ -66,6 +66,10 @@ export const MESSAGES = {
       NOT_FOUND: "Category not found.",
       NAME: "Name is required.",
     },
+    ACCOUNT: {
+      NAME_REQUIRED: "Name is required.",
+      BALANCE_REQUIRED: "Balance is required.",
+    },
   },
   SUCCESS: {
     USER: {
@@ -90,6 +94,9 @@ export const MESSAGES = {
       CREATED: "Budget created successfully.",
       UPDATED: "Budget updated successfully.",
       DELETED: "Budget deleted successfully.",
+    },
+    ACCOUNT: {
+      CREATED: "Account created successfully.",
     },
   },
 };
