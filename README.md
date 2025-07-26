@@ -71,6 +71,6 @@
       balance: número inicial.
       userId: referencia al usuario dueño.
 
-- [ ] Actualizar cuenta.
+- [x] Actualizar cuenta.
 - [ ] Lista cuentas.
 - [ ] Eliminar cuenta.
