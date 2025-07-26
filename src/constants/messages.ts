@@ -33,6 +33,10 @@ export const MESSAGES = {
       DUPLICATE_BUDGET: "Duplicate budget.",
       NOT_FOUNTD: "Budget not found.",
     },
+    ACCOUNT: {
+      DUPLICATE_BUDGET: "Duplicate account.",
+      NOT_FOUNTD: "Account not found.",
+    },
   },
   VALIDATION: {
     GENERAL: {
@@ -97,6 +101,7 @@ export const MESSAGES = {
     },
     ACCOUNT: {
       CREATED: "Account created successfully.",
+      UPDATED: "Account updated successfully.",
     },
   },
 };

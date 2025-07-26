@@ -15,4 +15,15 @@ export class AccountRepositoryMongo implements IAccountRepository {
       isDeleted,
     };
   }
+
+  async findById(accountId: string): Promise<IAccount | null> {
+    return await AccountModel.findById(accountId).lean<IAccount>(); // Usás .lean() para devolver POJO
+  }
+
+  async updateAccountById(
+    id: string,
+    data: Partial<IAccount>
+  ): Promise<IAccount | null> {
+    return await AccountModel.findByIdAndUpdate(id, data, { new: true });
+  }
 }

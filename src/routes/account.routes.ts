@@ -7,8 +7,12 @@ import { checkUserIsActive } from "../middlewares/checkUserIsActive";
 import { auditMiddleware } from "../middlewares/audit.middleware";
 // schemas
 import { createAccountSchema } from "../validations/createAccount.schema";
+import { updateAccountSchema } from "../validations/updateAccount.schema";
 // controllers
-import { createAccount } from "../controllers/account.controller";
+import {
+  createAccount,
+  updateAccount,
+} from "../controllers/account.controller";
 
 const router = Router();
 
@@ -20,6 +24,15 @@ router.post(
   checkUserIsActive,
   auditMiddleware("create_budget"),
   createAccount
+);
+router.put(
+  "/:id",
+  authMiddleware,
+  authorize("accounts.update"),
+  validateZod(updateAccountSchema, "body"),
+  checkUserIsActive,
+  auditMiddleware("update_account"),
+  updateAccount
 );
 
 export default router;

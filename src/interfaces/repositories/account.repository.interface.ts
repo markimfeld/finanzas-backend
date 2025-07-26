@@ -4,12 +4,15 @@ import { IAccount } from "../../models/account.model";
 
 export interface IAccountRepository {
   create(userId: string, dto: CreateAccountDto): Promise<IAccount>;
-  //   findById(accountId: string): Promise<IAccount | null>;
+  findById(accountId: string): Promise<IAccount | null>;
   //   findOne(options: FilterQuery<IAccount>): Promise<IAccount | null>;
   //   findAll(): Promise<IAccount[]>;
   //   findByFilters(dto: GetAccountsDto, userId: string): Promise<IAccount[]>;
   //   countByFilters(dto: GetAccountsDto, userId: string): Promise<number>;
-  //   updateBudget(id: string, data: Partial<IAccount>): Promise<IAccount | null>;
+  updateAccountById(
+    id: string,
+    data: Partial<IAccount>
+  ): Promise<IAccount | null>;
   //   deleteBudgetById(accountId: string, userId: string): Promise<void>;
 }
 
