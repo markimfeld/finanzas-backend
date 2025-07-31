@@ -11,8 +11,10 @@ import { updateAccountSchema } from "../validations/updateAccount.schema";
 // controllers
 import {
   createAccount,
+  getAccounts,
   updateAccount,
 } from "../controllers/account.controller";
+import { GetAccountsDtoSchema } from "../validations/getAccounts.schema";
 
 const router = Router();
 
@@ -33,6 +35,15 @@ router.put(
   checkUserIsActive,
   auditMiddleware("update_account"),
   updateAccount
+);
+router.get(
+  "/",
+  authMiddleware,
+  authorize("accounts.read"),
+  validateZod(GetAccountsDtoSchema, "query"),
+  checkUserIsActive,
+  auditMiddleware("get_all_accounts"),
+  getAccounts
 );
 
 export default router;
