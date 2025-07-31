@@ -4,6 +4,7 @@ import { IAccountRepository } from "../interfaces/repositories/account.repositor
 import { UpdateAccountDto } from "../dtos/updateAccount.dto";
 import { NotFoundError } from "../errors";
 import { MESSAGES } from "../constants/messages";
+import { PaginatedResult } from "../dtos/paginatedResult.dto";
 
 export class AccountService {
   constructor(private readonly accountRepo: IAccountRepository) {}
@@ -20,6 +21,14 @@ export class AccountService {
     }
 
     return account;
+  }
+
+  async getAccounts(
+    userId: string,
+    page: number,
+    limit: number
+  ): Promise<PaginatedResult<IAccount>> {
+    return this.accountRepo.findByUserPaginated(userId, page, limit);
   }
 
   async updateAccountById(

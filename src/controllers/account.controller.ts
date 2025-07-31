@@ -65,3 +65,27 @@ export const updateAccount = async (
     next(error);
   }
 };
+
+export const getAccounts = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const userId = req.user?.userId;
+
+    if (!userId) {
+      throw new ForbiddenError(MESSAGES.ERROR.AUTHORIZATION.FORBIDDEN);
+    }
+
+    const page = parseInt(req.query.page as string) || 1;
+
+    const limit = parseInt(req.query.limit as string) || 10;
+
+    const result = await accountService.getAccounts(userId, page, limit);
+
+    res.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
+};
