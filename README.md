@@ -72,5 +72,5 @@
       userId: referencia al usuario dueño.
 
 - [x] Actualizar cuenta.
-- [ ] Lista cuentas.
+- [x] Lista cuentas.
 - [ ] Eliminar cuenta.

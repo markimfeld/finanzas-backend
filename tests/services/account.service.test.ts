@@ -142,9 +142,13 @@ describe("Account: update account.", () => {
 
 describe("Account: get accounts.", () => {
   let access_token: string;
+  let another_access_token: string;
+  let another2_access_token: string;
   let anAccount: IAccount | null;
   let anAccount2: IAccount | null;
+  let anAccount3: IAccount | null;
   let user: IUser | null;
+  let anotherUser: IUser | null;
 
   beforeEach(async () => {
     await UserModel.deleteMany({});
@@ -156,8 +160,17 @@ describe("Account: get accounts.", () => {
       "get_accounts_paginate@example.com",
       "StrongPass123!"
     );
+    another_access_token = await getAuthToken(
+      "another_token@example.com",
+      "StrongPass123!"
+    );
+    another2_access_token = await getAuthToken(
+      "another2_token@example.com",
+      "StrongPass123!"
+    );
 
     user = await getOne("get_accounts_paginate@example.com");
+    anotherUser = await getOne("another_token@example.com");
 
     anAccount = await AccountModel.create({
       name: "Brubank",
@@ -171,6 +184,12 @@ describe("Account: get accounts.", () => {
       balance: 150000,
       userId: user?._id,
     });
+    anAccount3 = await AccountModel.create({
+      name: "Otra cuenta",
+      type: "bank",
+      balance: 150000,
+      userId: anotherUser?._id,
+    });
   });
 
   it("should get all accounts.", async () => {
@@ -181,6 +200,7 @@ describe("Account: get accounts.", () => {
     expect(res.status).toBe(200);
     expect(res.body.data.length).toBe(2);
   });
+
   it("should get accounts limiting 1 and page 1.", async () => {
     const res = await request(app)
       .get(`/api/accounts?limit=1&page=1`)
@@ -197,5 +217,29 @@ describe("Account: get accounts.", () => {
     expect(res.body.pagination.total).toBe(2);
     expect(res.body.pagination.page).toBe(1);
     expect(res.body.pagination.limit).toBe(1);
+  });
+
+  it("should return 401 if access token is not provided.", async () => {
+    const res = await request(app).get(`/api/accounts`);
+
+    expect(res.status).toBe(401);
+  });
+
+  it("should get only accounts belong to the user logged in.", async () => {
+    const res = await request(app)
+      .get(`/api/accounts`)
+      .set("Authorization", `Bearer ${another_access_token}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.data.length).toBe(1);
+  });
+
+  it("should get zero accounts if user dont have accounts.", async () => {
+    const res = await request(app)
+      .get(`/api/accounts`)
+      .set("Authorization", `Bearer ${another2_access_token}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.data.length).toBe(0);
   });
 });
