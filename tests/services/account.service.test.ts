@@ -139,3 +139,63 @@ describe("Account: update account.", () => {
     expect(res.status).toBe(401);
   });
 });
+
+describe("Account: get accounts.", () => {
+  let access_token: string;
+  let anAccount: IAccount | null;
+  let anAccount2: IAccount | null;
+  let user: IUser | null;
+
+  beforeEach(async () => {
+    await UserModel.deleteMany({});
+    await AuditLogModel.deleteMany({});
+    await CategoryModel.deleteMany({});
+    await BudgetModel.deleteMany({});
+    await AccountModel.deleteMany({});
+    access_token = await getAuthToken(
+      "get_accounts_paginate@example.com",
+      "StrongPass123!"
+    );
+
+    user = await getOne("get_accounts_paginate@example.com");
+
+    anAccount = await AccountModel.create({
+      name: "Brubank",
+      type: "bank",
+      balance: 100000,
+      userId: user?._id,
+    });
+    anAccount2 = await AccountModel.create({
+      name: "Galicia",
+      type: "bank",
+      balance: 150000,
+      userId: user?._id,
+    });
+  });
+
+  it("should get all accounts.", async () => {
+    const res = await request(app)
+      .get(`/api/accounts`)
+      .set("Authorization", `Bearer ${access_token}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.data.length).toBe(2);
+  });
+  it("should get accounts limiting 1 and page 1.", async () => {
+    const res = await request(app)
+      .get(`/api/accounts?limit=1&page=1`)
+      .set("Authorization", `Bearer ${access_token}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.data.length).toBe(1);
+    expect(res.body).toHaveProperty("pagination");
+    expect(res.body.pagination).toHaveProperty("pages");
+    expect(res.body.pagination).toHaveProperty("total");
+    expect(res.body.pagination).toHaveProperty("page");
+    expect(res.body.pagination).toHaveProperty("limit");
+    expect(res.body.pagination.pages).toBe(2);
+    expect(res.body.pagination.total).toBe(2);
+    expect(res.body.pagination.page).toBe(1);
+    expect(res.body.pagination.limit).toBe(1);
+  });
+});
