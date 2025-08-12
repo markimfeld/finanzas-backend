@@ -73,4 +73,4 @@
 
 - [x] Actualizar cuenta.
 - [x] Lista cuentas.
-- [ ] Eliminar cuenta.
+- [x] Eliminar cuenta.

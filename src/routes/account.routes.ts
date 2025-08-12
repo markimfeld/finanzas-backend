@@ -11,6 +11,7 @@ import { updateAccountSchema } from "../validations/updateAccount.schema";
 // controllers
 import {
   createAccount,
+  deleteAccountById,
   getAccounts,
   updateAccount,
 } from "../controllers/account.controller";
@@ -44,6 +45,14 @@ router.get(
   checkUserIsActive,
   auditMiddleware("get_all_accounts"),
   getAccounts
+);
+router.delete(
+  "/:id",
+  authMiddleware,
+  authorize("accounts.delete"),
+  checkUserIsActive,
+  auditMiddleware("delete_account"),
+  deleteAccountById
 );
 
 export default router;

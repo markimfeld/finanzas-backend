@@ -48,4 +48,11 @@ export class AccountRepositoryMongo implements IAccountRepository {
   ): Promise<IAccount | null> {
     return await AccountModel.findByIdAndUpdate(id, data, { new: true });
   }
+
+  async softDeleteAccountById(id: string, userId: string): Promise<void> {
+    await AccountModel.updateOne(
+      { _id: id, userId: userId, isDeleted: false },
+      { $set: { isDeleted: true } }
+    );
+  }
 }

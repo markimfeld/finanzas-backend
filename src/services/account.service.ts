@@ -46,4 +46,15 @@ export class AccountService {
 
     return updatedAccount;
   }
+
+  async softDeleteAccountById(accountId: string, userId: string) {
+    // Podés hacer una verificación previa si querés
+    const account = await this.accountRepo.findById(accountId);
+
+    if (!account || account.userId.toString() !== userId || account.isDeleted) {
+      throw new NotFoundError(MESSAGES.ERROR.ACCOUNT.NOT_FOUNTD);
+    }
+
+    await this.accountRepo.softDeleteAccountById(accountId, userId);
+  }
 }

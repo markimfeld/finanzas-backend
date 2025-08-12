@@ -4,7 +4,7 @@ import { CreateAccountDto } from "../dtos/createAccount.dto";
 import { UpdateAccountDto } from "../dtos/updateAccount.dto";
 import { AccountDTO } from "../dtos/account.dto";
 // errors
-import { ForbiddenError } from "../errors";
+import { BadRequestError, ForbiddenError } from "../errors";
 // messages
 import { MESSAGES } from "../constants/messages";
 // services
@@ -85,6 +85,32 @@ export const getAccounts = async (
     const result = await accountService.getAccounts(userId, page, limit);
 
     res.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteAccountById = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const userId = req.user?.userId;
+    const { id: accountId } = req.params;
+
+    if (!userId) {
+      throw new BadRequestError(
+        MESSAGES.ERROR.AUTHORIZATION.USER_NOT_AUTHENTICATED
+      );
+    }
+
+    await accountService.softDeleteAccountById(accountId, userId);
+
+    res.status(200).json({
+      success: true,
+      message: MESSAGES.SUCCESS.ACCOUNT.DELETED,
+    });
   } catch (error) {
     next(error);
   }

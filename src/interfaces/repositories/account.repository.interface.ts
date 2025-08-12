@@ -15,4 +15,5 @@ export interface IAccountRepository {
     id: string,
     data: Partial<IAccount>
   ): Promise<IAccount | null>;
+  softDeleteAccountById(id: string, userId: string): Promise<void>;
 }
