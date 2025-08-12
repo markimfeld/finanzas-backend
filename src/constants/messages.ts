@@ -102,6 +102,7 @@ export const MESSAGES = {
     ACCOUNT: {
       CREATED: "Account created successfully.",
       UPDATED: "Account updated successfully.",
+      DELETED: "Account deleted successfully.",
     },
   },
 };

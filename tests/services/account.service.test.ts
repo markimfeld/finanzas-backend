@@ -243,3 +243,75 @@ describe("Account: get accounts.", () => {
     expect(res.body.data.length).toBe(0);
   });
 });
+
+describe("Account: delete account.", () => {
+  let access_token: string;
+  let another_access_token: string;
+  let anAccount: IAccount | null;
+  let anAccount2: IAccount | null;
+  let user: IUser | null;
+  let anotherUser: IUser | null;
+
+  beforeEach(async () => {
+    await UserModel.deleteMany({});
+    await AuditLogModel.deleteMany({});
+    await CategoryModel.deleteMany({});
+    await BudgetModel.deleteMany({});
+    await AccountModel.deleteMany({});
+    access_token = await getAuthToken(
+      "get_accounts_paginate@example.com",
+      "StrongPass123!"
+    );
+    another_access_token = await getAuthToken(
+      "another_token@example.com",
+      "StrongPass123!"
+    );
+
+    user = await getOne("get_accounts_paginate@example.com");
+    anotherUser = await getOne("another_token@example.com");
+
+    anAccount = await AccountModel.create({
+      name: "Brubank",
+      type: "bank",
+      balance: 100000,
+      userId: user?._id,
+    });
+    anAccount2 = await AccountModel.create({
+      name: "Galicia",
+      type: "bank",
+      balance: 150000,
+      userId: user?._id,
+    });
+  });
+
+  it("should delete an account by id.", async () => {
+    const res = await request(app)
+      .delete(`/api/accounts/${anAccount?._id}`)
+      .set("Authorization", `Bearer ${access_token}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveProperty("message");
+    expect(res.body.message).toBe(MESSAGES.SUCCESS.ACCOUNT.DELETED);
+
+    const res2 = await request(app)
+      .get("/api/accounts")
+      .set("Authorization", `Bearer ${access_token}`);
+
+    expect(res2.body.data.length).toBe(1);
+    expect(res2.body.data[0].name).toBe("Galicia");
+  });
+
+  it("should return 401 if access token is not provided.", async () => {
+    const res = await request(app).delete(`/api/accounts/${anAccount?._id}`);
+
+    expect(res.status).toBe(401);
+  });
+
+  it("should delete an user own account.", async () => {
+    const res = await request(app)
+      .delete(`/api/accounts/${anAccount?._id}`)
+      .set("Authorization", `Bearer ${another_access_token}`);
+
+    expect(res.status).toBe(404);
+  });
+});
