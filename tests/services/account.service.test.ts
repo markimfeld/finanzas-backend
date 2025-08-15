@@ -249,6 +249,7 @@ describe("Account: delete account.", () => {
   let another_access_token: string;
   let anAccount: IAccount | null;
   let anAccount2: IAccount | null;
+  let anAccount3: IAccount | null;
   let user: IUser | null;
   let anotherUser: IUser | null;
 
@@ -273,7 +274,7 @@ describe("Account: delete account.", () => {
     anAccount = await AccountModel.create({
       name: "Brubank",
       type: "bank",
-      balance: 100000,
+      balance: 0,
       userId: user?._id,
     });
     anAccount2 = await AccountModel.create({
@@ -281,6 +282,13 @@ describe("Account: delete account.", () => {
       type: "bank",
       balance: 150000,
       userId: user?._id,
+    });
+    anAccount3 = await AccountModel.create({
+      name: "Test",
+      type: "bank",
+      balance: 0,
+      userId: user?._id,
+      isDeleted: true,
     });
   });
 
@@ -311,6 +319,26 @@ describe("Account: delete account.", () => {
     const res = await request(app)
       .delete(`/api/accounts/${anAccount?._id}`)
       .set("Authorization", `Bearer ${another_access_token}`);
+
+    expect(res.status).toBe(404);
+  });
+
+  it("should return 400 if the user is trying to delete an account wiht 0 balance.", async () => {
+    const res = await request(app)
+      .delete(`/api/accounts/${anAccount2?._id}`)
+      .set("Authorization", `Bearer ${access_token}`);
+
+    expect(res.status).toBe(400);
+    expect(res.body.errors[0].message).toBe(
+      MESSAGES.ERROR.ACCOUNT
+        .CANNOT_DELETE_ACCOUNT_WITH_BALANCE_GREATER_THAN_ZERO
+    );
+  });
+
+  it("should return 404 if the user is trying to delete an account already deleted.", async () => {
+    const res = await request(app)
+      .delete(`/api/accounts/${anAccount3?._id}`)
+      .set("Authorization", `Bearer ${access_token}`);
 
     expect(res.status).toBe(404);
   });

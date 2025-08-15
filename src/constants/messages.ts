@@ -36,6 +36,8 @@ export const MESSAGES = {
     ACCOUNT: {
       DUPLICATE_BUDGET: "Duplicate account.",
       NOT_FOUNTD: "Account not found.",
+      CANNOT_DELETE_ACCOUNT_WITH_BALANCE_GREATER_THAN_ZERO:
+        "Account cannot be deleted, the balance is greater than zero.",
     },
   },
   VALIDATION: {
