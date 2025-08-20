@@ -25,7 +25,7 @@ const transactionSchema = new Schema<TransactionDocument>(
     },
     category: {
       type: Schema.Types.ObjectId,
-      ref: "User",
+      ref: "Category",
       required: true,
     },
     account: {
@@ -37,6 +37,15 @@ const transactionSchema = new Schema<TransactionDocument>(
       type: Number,
       required: true,
       min: 0,
+    },
+    type: {
+      type: String,
+      enum: ["income", "expense"],
+      required: true,
+    },
+    description: {
+      type: String,
+      required: true,
     },
     isDeleted: {
       type: Boolean,

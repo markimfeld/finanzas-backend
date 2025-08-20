@@ -76,6 +76,9 @@ export const MESSAGES = {
       NAME_REQUIRED: "Name is required.",
       BALANCE_REQUIRED: "Balance is required.",
     },
+    TRANSACTION: {
+      AMOUNT_REQUIRED: "Amount is required.",
+    },
   },
   SUCCESS: {
     USER: {
@@ -105,6 +108,11 @@ export const MESSAGES = {
       CREATED: "Account created successfully.",
       UPDATED: "Account updated successfully.",
       DELETED: "Account deleted successfully.",
+    },
+    TRANSACTION: {
+      CREATED: "Transaction created successfully.",
+      UPDATED: "Transaction updated successfully.",
+      DELETED: "Transaction deleted successfully.",
     },
   },
 };
