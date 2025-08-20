@@ -8,6 +8,7 @@ import authRoutes from "./routes/auth.routes";
 import budgetRoutes from "./routes/budget.routes";
 import categoryRoutes from "./routes/category.routes";
 import accountRoutes from "./routes/account.routes";
+import transactionRoutes from "./routes/transaction.routes";
 
 // middleware
 import { errorHandler } from "./middlewares/error.middleware";
@@ -26,6 +27,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/budgets", budgetRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/accounts", accountRoutes);
+app.use("/api/transactions", transactionRoutes);
 
 // Manejo de rutas no encontradas (404)
 app.use(notFoundHandler);

@@ -74,3 +74,17 @@
 - [x] Actualizar cuenta.
 - [x] Lista cuentas.
 - [x] Eliminar cuenta.
+
+# 🧾 Módulo: Transacciones (transactions)
+
+## ✅ Funcionalidades básicas
+
+- [x] Crear transación.
+      description: descripcion de la operacion (ej: "carga de nafta").
+      type: tipo de transaccion ("income", "expense").
+      amount: monto de la transación.
+      userId: referencia al usuario dueño.
+
+- [ ] Actualizar transación.
+- [ ] Lista transacciones.
+- [ ] Eliminar transación.

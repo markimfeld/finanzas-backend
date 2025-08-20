@@ -8,6 +8,8 @@ import { CategoryRepositoryMongo } from "../repositories/implementations/mongodb
 import { CategoryService } from "./category.service";
 import { AccountService } from "./account.service";
 import { AccountRepositoryMongo } from "../repositories/implementations/mongodb/account.repository.mongo";
+import { TransactionRepositoryMongo } from "../repositories/implementations/mongodb/transaction.repository.mongo";
+import { TransactionService } from "./transaction.service";
 
 const userRepository = new UserRepositoryMongo();
 export const userService = new UserService(userRepository);
@@ -26,3 +28,6 @@ export const categoryService = new CategoryService(categoryRepository);
 
 const accountRepository = new AccountRepositoryMongo();
 export const accountService = new AccountService(accountRepository);
+
+const transactionRepository = new TransactionRepositoryMongo();
+export const transactionService = new TransactionService(transactionRepository);

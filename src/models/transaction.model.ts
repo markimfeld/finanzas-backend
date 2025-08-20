@@ -1,21 +1,22 @@
 import { Schema, model, Document } from "mongoose";
 
-export interface IBudget {
+export interface ITransaction {
   _id: string;
   userId: Schema.Types.ObjectId;
   category: Schema.Types.ObjectId;
+  account: Schema.Types.ObjectId;
   amount: number;
+  type: "income" | "expense";
+  description: string;
   isDeleted: boolean;
-  startDate: Date;
-  endDate: Date;
   createdAt: Date;
   updatedAt: Date;
 }
 
 /** Documento que Mongoose guarda en la colección */
-export type BudgetDocument = IBudget & Document;
+export type TransactionDocument = ITransaction & Document;
 
-const budgetSchema = new Schema<BudgetDocument>(
+const transactionSchema = new Schema<TransactionDocument>(
   {
     userId: {
       type: Schema.Types.ObjectId,
@@ -27,17 +28,23 @@ const budgetSchema = new Schema<BudgetDocument>(
       ref: "Category",
       required: true,
     },
+    account: {
+      type: Schema.Types.ObjectId,
+      ref: "Account",
+      required: true,
+    },
     amount: {
       type: Number,
       required: true,
       min: 0,
     },
-    startDate: {
-      type: Date,
+    type: {
+      type: String,
+      enum: ["income", "expense"],
       required: true,
     },
-    endDate: {
-      type: Date,
+    description: {
+      type: String,
       required: true,
     },
     isDeleted: {
@@ -48,4 +55,4 @@ const budgetSchema = new Schema<BudgetDocument>(
   { timestamps: true }
 );
 
-export const BudgetModel = model("Budget", budgetSchema);
+export const TransactionModel = model("Transaction", transactionSchema);
