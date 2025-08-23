@@ -2,6 +2,8 @@ import { BadRequestError, NotFoundError } from "../errors";
 import { MESSAGES } from "../constants/messages";
 import { CreateTransactionDto } from "../dtos/createTransaction.dto";
 import { ITransactionRepository } from "../interfaces/repositories/transaction.repository.interface";
+import { ITransaction } from "../models/transaction.model";
+import { PaginatedResult } from "../dtos/paginatedResult.dto";
 
 export class TransactionService {
   constructor(private readonly transactionRepository: ITransactionRepository) {}
@@ -20,13 +22,13 @@ export class TransactionService {
   //     return account;
   //   }
 
-  //   async getAccounts(
-  //     userId: string,
-  //     page: number,
-  //     limit: number
-  //   ): Promise<PaginatedResult<IAccount>> {
-  //     return this.accountRepo.findByUserPaginated(userId, page, limit);
-  //   }
+  async getTransactions(
+    userId: string,
+    page: number,
+    limit: number
+  ): Promise<PaginatedResult<ITransaction>> {
+    return this.transactionRepository.findByUserPaginated(userId, page, limit);
+  }
 
   //   async updateAccountById(
   //     accountId: string,
