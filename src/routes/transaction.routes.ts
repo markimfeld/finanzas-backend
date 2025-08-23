@@ -17,7 +17,11 @@ import {
 } from "../controllers/account.controller";
 import { GetAccountsDtoSchema } from "../validations/getAccounts.schema";
 import { createTransactionSchema } from "../validations/createTransactionSchema";
-import { createTransaction } from "../controllers/transaction.controller";
+import {
+  createTransaction,
+  getTransactions,
+} from "../controllers/transaction.controller";
+import { GetTransactionsDtoSchema } from "../validations/getTransactions.schema";
 
 const router = Router();
 
@@ -39,15 +43,15 @@ router.post(
 //   auditMiddleware("update_account"),
 //   updateAccount
 // );
-// router.get(
-//   "/",
-//   authMiddleware,
-//   authorize("accounts.read"),
-//   validateZod(GetAccountsDtoSchema, "query"),
-//   checkUserIsActive,
-//   auditMiddleware("get_all_accounts"),
-//   getAccounts
-// );
+router.get(
+  "/",
+  authMiddleware,
+  authorize("transactions.read"),
+  validateZod(GetTransactionsDtoSchema, "query"),
+  checkUserIsActive,
+  auditMiddleware("get_all_transactions"),
+  getTransactions
+);
 // router.delete(
 //   "/:id",
 //   authMiddleware,

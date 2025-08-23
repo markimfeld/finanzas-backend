@@ -5,6 +5,7 @@ import {
   ITransaction,
   TransactionModel,
 } from "../../../models/transaction.model";
+import { PaginatedResult } from "../../../dtos/paginatedResult.dto";
 
 export class TransactionRepositoryMongo implements ITransactionRepository {
   async create(
@@ -48,8 +49,25 @@ export class TransactionRepositoryMongo implements ITransactionRepository {
     return null;
   }
 
-  async findAll(userId: string, filters?: any): Promise<ITransaction[]> {
-    return [];
+  async findByUserPaginated(
+    userId: string,
+    page: number,
+    limit: number
+  ): Promise<PaginatedResult<ITransaction>> {
+    const skip = (page - 1) * limit;
+
+    const [accounts, total] = await Promise.all([
+      TransactionModel.find({ userId, isDeleted: false })
+        .skip(skip)
+        .limit(limit)
+        .sort({ createdAt: -1 }),
+      TransactionModel.countDocuments({ userId, isDeleted: false }),
+    ]);
+
+    return {
+      data: accounts,
+      pagination: { total, page, limit, pages: Math.ceil(total / limit) },
+    };
   }
 
   async updateTransactionById(

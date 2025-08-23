@@ -12,7 +12,10 @@ import { setupMemoryMongoDB, teardownMemoryMongoDB } from "../setup";
 import { MESSAGES } from "../../src/constants/messages";
 import { BudgetModel } from "../../src/models/budget.model";
 import { AccountModel, IAccount } from "../../src/models/account.model";
-import { TransactionModel } from "../../src/models/transaction.model";
+import {
+  ITransaction,
+  TransactionModel,
+} from "../../src/models/transaction.model";
 import { IUser } from "../../src/interfaces/repositories/user.repository.interface";
 
 jest.setTimeout(15000);
@@ -95,6 +98,124 @@ describe("Transaction: create transaction", () => {
 
     expect(res.status).toBe(401);
     expect(res.body).toHaveProperty("errors");
+  });
+});
+
+describe("Transaction: get transactions.", () => {
+  let access_token: string;
+  let another_access_token: string;
+  let another2_access_token: string;
+  let anAccount: IAccount | null;
+  let anAccount2: IAccount | null;
+  let anAccount3: IAccount | null;
+  let user: IUser | null;
+  let anotherUser: IUser | null;
+  let transaction1: ITransaction | null;
+  let transaction2: ITransaction | null;
+  let transaction3: ITransaction | null;
+  let category1: ICategory | null;
+
+  beforeEach(async () => {
+    await UserModel.deleteMany({});
+    await AuditLogModel.deleteMany({});
+    await CategoryModel.deleteMany({});
+    await BudgetModel.deleteMany({});
+    await AccountModel.deleteMany({});
+    await TransactionModel.deleteMany({});
+
+    access_token = await getAuthToken(
+      "get_transactions_paginate@example.com",
+      "StrongPass123!"
+    );
+
+    another_access_token = await getAuthToken(
+      "get_transactions2_paginate@example.com",
+      "StrongPass1234!"
+    );
+
+    user = await getOne("get_transactions_paginate@example.com");
+    anotherUser = await getOne("get_transactions2_paginate@example.com");
+
+    anAccount = await AccountModel.create({
+      name: "Brubank",
+      type: "bank",
+      balance: 100000,
+      userId: user?._id,
+    });
+
+    category1 = await CategoryModel.create({
+      name: "Categoriaa 1",
+      userId: user?._id,
+    });
+
+    transaction1 = await TransactionModel.create({
+      userId: user?._id,
+      category: category1?._id,
+      account: anAccount?._id,
+      amount: 200,
+      type: "expense",
+      description: "test expense",
+    });
+
+    transaction2 = await TransactionModel.create({
+      userId: user?._id,
+      category: category1?._id,
+      account: anAccount?._id,
+      amount: 300,
+      type: "expense",
+      description: "test expense 2",
+    });
+
+    transaction3 = await TransactionModel.create({
+      userId: anotherUser?._id,
+      category: category1?._id,
+      account: anAccount?._id,
+      amount: 500,
+      type: "expense",
+      description: "test expense 3",
+    });
+  });
+
+  it("should get all transactions.", async () => {
+    const res = await request(app)
+      .get(`/api/transactions`)
+      .set("Authorization", `Bearer ${access_token}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.data.length).toBe(2);
+  });
+
+  it("should get transactions limiting 1 and page 1.", async () => {
+    const res = await request(app)
+      .get(`/api/transactions?limit=1&page=1`)
+      .set("Authorization", `Bearer ${access_token}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.data.length).toBe(1);
+    expect(res.body).toHaveProperty("pagination");
+    expect(res.body.pagination).toHaveProperty("pages");
+    expect(res.body.pagination).toHaveProperty("total");
+    expect(res.body.pagination).toHaveProperty("page");
+    expect(res.body.pagination).toHaveProperty("limit");
+    expect(res.body.pagination.pages).toBe(2);
+    expect(res.body.pagination.total).toBe(2);
+    expect(res.body.pagination.page).toBe(1);
+    expect(res.body.pagination.limit).toBe(1);
+  });
+
+  it("should return 401 if access token is not provided.", async () => {
+    const res = await request(app).get(`/api/transactions`);
+
+    expect(res.status).toBe(401);
+  });
+
+  it("should get only transactions belong to the user logged in.", async () => {
+    const res = await request(app)
+      .get(`/api/transactions`)
+      .set("Authorization", `Bearer ${another_access_token}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.data.length).toBe(1);
   });
 });
 

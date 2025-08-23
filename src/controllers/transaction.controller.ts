@@ -67,29 +67,33 @@ export const createTransaction = async (
 //   }
 // };
 
-// export const getAccounts = async (
-//   req: Request,
-//   res: Response,
-//   next: NextFunction
-// ): Promise<void> => {
-//   try {
-//     const userId = req.user?.userId;
+export const getTransactions = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const userId = req.user?.userId;
 
-//     if (!userId) {
-//       throw new ForbiddenError(MESSAGES.ERROR.AUTHORIZATION.FORBIDDEN);
-//     }
+    if (!userId) {
+      throw new ForbiddenError(MESSAGES.ERROR.AUTHORIZATION.FORBIDDEN);
+    }
 
-//     const page = parseInt(req.query.page as string) || 1;
+    const page = parseInt(req.query.page as string) || 1;
 
-//     const limit = parseInt(req.query.limit as string) || 10;
+    const limit = parseInt(req.query.limit as string) || 10;
 
-//     const result = await accountService.getAccounts(userId, page, limit);
+    const result = await transactionService.getTransactions(
+      userId,
+      page,
+      limit
+    );
 
-//     res.status(200).json(result);
-//   } catch (error) {
-//     next(error);
-//   }
-// };
+    res.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
+};
 
 // export const deleteAccountById = async (
 //   req: Request,
