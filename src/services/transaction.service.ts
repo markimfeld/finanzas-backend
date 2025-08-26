@@ -4,6 +4,7 @@ import { CreateTransactionDto } from "../dtos/createTransaction.dto";
 import { ITransactionRepository } from "../interfaces/repositories/transaction.repository.interface";
 import { ITransaction } from "../models/transaction.model";
 import { PaginatedResult } from "../dtos/paginatedResult.dto";
+import { UpdateTransactionDto } from "../dtos/updateTransaction.dto";
 
 export class TransactionService {
   constructor(private readonly transactionRepository: ITransactionRepository) {}
@@ -12,15 +13,16 @@ export class TransactionService {
     return this.transactionRepository.create(userId, dto);
   }
 
-  //   async getAccountById(accountId: string): Promise<IAccount> {
-  //     const account = await this.accountRepo.findById(accountId);
+  async getTransactionById(transactionId: string): Promise<ITransaction> {
+    const transaction =
+      await this.transactionRepository.findById(transactionId);
 
-  //     if (!account) {
-  //       throw new NotFoundError(MESSAGES.ERROR.ACCOUNT.NOT_FOUNTD);
-  //     }
+    if (!transaction) {
+      throw new NotFoundError(MESSAGES.ERROR.TRANSACTION.NOT_FOUND);
+    }
 
-  //     return account;
-  //   }
+    return transaction;
+  }
 
   async getTransactions(
     userId: string,
@@ -30,21 +32,22 @@ export class TransactionService {
     return this.transactionRepository.findByUserPaginated(userId, page, limit);
   }
 
-  //   async updateAccountById(
-  //     accountId: string,
-  //     accountData: UpdateAccountDto
-  //   ): Promise<IAccount> {
-  //     const updatedAccount = await this.accountRepo.updateAccountById(
-  //       accountId,
-  //       accountData
-  //     );
+  async updateTransactionById(
+    transactionId: string,
+    transactionData: UpdateTransactionDto
+  ): Promise<ITransaction> {
+    const updatedTransaction =
+      await this.transactionRepository.updateTransactionById(
+        transactionId,
+        transactionData
+      );
 
-  //     if (!updatedAccount) {
-  //       throw new NotFoundError(MESSAGES.ERROR.ACCOUNT.NOT_FOUNTD);
-  //     }
+    if (!updatedTransaction) {
+      throw new NotFoundError(MESSAGES.ERROR.TRANSACTION.NOT_FOUND);
+    }
 
-  //     return updatedAccount;
-  //   }
+    return updatedTransaction;
+  }
 
   //   async softDeleteAccountById(accountId: string, userId: string) {
   //     // Podés hacer una verificación previa si querés
