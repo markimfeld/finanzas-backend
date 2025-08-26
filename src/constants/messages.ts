@@ -39,6 +39,9 @@ export const MESSAGES = {
       CANNOT_DELETE_ACCOUNT_WITH_BALANCE_GREATER_THAN_ZERO:
         "Account cannot be deleted, the balance is greater than zero.",
     },
+    TRANSACTION: {
+      NOT_FOUND: "Transaction not found.",
+    },
   },
   VALIDATION: {
     GENERAL: {

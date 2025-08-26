@@ -5,7 +5,7 @@ import { PaginatedResult } from "../../dtos/paginatedResult.dto";
 
 export interface ITransactionRepository {
   create(userId: string, dto: CreateTransactionDto): Promise<ITransaction>;
-  findById(userId: string, transactionId: string): Promise<ITransaction | null>;
+  findById(transactionId: string): Promise<ITransaction | null>;
   findByUserPaginated(
     userId: string,
     page: number,

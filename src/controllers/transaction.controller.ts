@@ -7,6 +7,8 @@ import { BadRequestError, ForbiddenError } from "../errors";
 import { MESSAGES } from "../constants/messages";
 // services
 import { transactionService } from "../services";
+import { UpdateTransactionDto } from "../dtos/updateTransaction.dto";
+import { TransactionDTO } from "../dtos/transaction.dto";
 
 export const createTransaction = async (
   req: Request<{}, {}, CreateTransactionDto>,
@@ -36,36 +38,37 @@ export const createTransaction = async (
   }
 };
 
-// export const updateAccount = async (
-//   req: Request<{ id: string }, {}, UpdateAccountDto>,
-//   res: Response,
-//   next: NextFunction
-// ): Promise<void> => {
-//   try {
-//     const accountIdToUpdate = req.params.id;
-//     const authenticatedUser = req.user!; // ya está validado por authMiddleware
+export const updateTransaction = async (
+  req: Request<{ id: string }, {}, UpdateTransactionDto>,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const transactionIdUpdate = req.params.id;
+    const authenticatedUser = req.user!; // ya está validado por authMiddleware
 
-//     const account = await accountService.getAccountById(accountIdToUpdate);
-//     // verifico que el budget que quiero modificar sea del usuario logueado
-//     if (account.userId?.toString() !== authenticatedUser.userId) {
-//       throw new ForbiddenError(MESSAGES.ERROR.AUTHORIZATION.FORBIDDEN);
-//     }
+    const transaction =
+      await transactionService.getTransactionById(transactionIdUpdate);
+    // verifico que el budget que quiero modificar sea del usuario logueado
+    if (transaction.userId?.toString() !== authenticatedUser.userId) {
+      throw new ForbiddenError(MESSAGES.ERROR.AUTHORIZATION.FORBIDDEN);
+    }
 
-//     const updatedAccount = await accountService.updateAccountById(
-//       accountIdToUpdate,
-//       req.body
-//     );
-//     const safeAccount = AccountDTO.from(updatedAccount);
+    const updatedTransaction = await transactionService.updateTransactionById(
+      transactionIdUpdate,
+      req.body
+    );
+    const safeTransaction = TransactionDTO.from(updatedTransaction);
 
-//     res.status(200).json({
-//       success: true,
-//       data: safeAccount,
-//       message: MESSAGES.SUCCESS.ACCOUNT.UPDATED,
-//     });
-//   } catch (error) {
-//     next(error);
-//   }
-// };
+    res.status(200).json({
+      success: true,
+      data: safeTransaction,
+      message: MESSAGES.SUCCESS.TRANSACTION.UPDATED,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
 export const getTransactions = async (
   req: Request,

@@ -42,11 +42,8 @@ export class TransactionRepositoryMongo implements ITransactionRepository {
     };
   }
 
-  async findById(
-    userId: string,
-    transactionId: string
-  ): Promise<ITransaction | null> {
-    return null;
+  async findById(transactionId: string): Promise<ITransaction | null> {
+    return await TransactionModel.findById(transactionId).lean<ITransaction>(); // Usás .lean() para devolver POJO
   }
 
   async findByUserPaginated(
@@ -74,7 +71,7 @@ export class TransactionRepositoryMongo implements ITransactionRepository {
     id: string,
     data: UpdateTransactionDto
   ): Promise<ITransaction | null> {
-    return null;
+    return await TransactionModel.findByIdAndUpdate(id, data, { new: true });
   }
 
   async delete(userId: string, id: string): Promise<void> {}

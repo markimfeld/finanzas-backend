@@ -20,8 +20,10 @@ import { createTransactionSchema } from "../validations/createTransactionSchema"
 import {
   createTransaction,
   getTransactions,
+  updateTransaction,
 } from "../controllers/transaction.controller";
 import { GetTransactionsDtoSchema } from "../validations/getTransactions.schema";
+import { updateTransactionSchema } from "../validations/updateTransactionSchema";
 
 const router = Router();
 
@@ -34,15 +36,15 @@ router.post(
   auditMiddleware("create_transaction"),
   createTransaction
 );
-// router.put(
-//   "/:id",
-//   authMiddleware,
-//   authorize("accounts.update"),
-//   validateZod(updateAccountSchema, "body"),
-//   checkUserIsActive,
-//   auditMiddleware("update_account"),
-//   updateAccount
-// );
+router.put(
+  "/:id",
+  authMiddleware,
+  authorize("transactions.update"),
+  validateZod(updateTransactionSchema, "body"),
+  checkUserIsActive,
+  auditMiddleware("update_transaction"),
+  updateTransaction
+);
 router.get(
   "/",
   authMiddleware,
