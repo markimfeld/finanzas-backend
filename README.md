@@ -85,6 +85,6 @@
       amount: monto de la transación.
       userId: referencia al usuario dueño.
 
-- [ ] Actualizar transación.
-- [ ] Lista transacciones.
-- [ ] Eliminar transación.
+- [x] Actualizar transación.
+- [x] Lista transacciones.
+- [x] Eliminar transación.

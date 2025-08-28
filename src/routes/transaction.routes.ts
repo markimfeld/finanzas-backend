@@ -5,20 +5,10 @@ import { authorize } from "../middlewares/role.middleware";
 import { validateZod } from "../middlewares/validateZod";
 import { checkUserIsActive } from "../middlewares/checkUserIsActive";
 import { auditMiddleware } from "../middlewares/audit.middleware";
-// schemas
-import { createAccountSchema } from "../validations/createAccount.schema";
-import { updateAccountSchema } from "../validations/updateAccount.schema";
-// controllers
-import {
-  createAccount,
-  deleteAccountById,
-  getAccounts,
-  updateAccount,
-} from "../controllers/account.controller";
-import { GetAccountsDtoSchema } from "../validations/getAccounts.schema";
 import { createTransactionSchema } from "../validations/createTransactionSchema";
 import {
   createTransaction,
+  deleteTransactionById,
   getTransactions,
   updateTransaction,
 } from "../controllers/transaction.controller";
@@ -54,13 +44,13 @@ router.get(
   auditMiddleware("get_all_transactions"),
   getTransactions
 );
-// router.delete(
-//   "/:id",
-//   authMiddleware,
-//   authorize("accounts.delete"),
-//   checkUserIsActive,
-//   auditMiddleware("delete_account"),
-//   deleteAccountById
-// );
+router.delete(
+  "/:id",
+  authMiddleware,
+  authorize("transactions.delete"),
+  checkUserIsActive,
+  auditMiddleware("delete_transaction"),
+  deleteTransactionById
+);
 
 export default router;

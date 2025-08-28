@@ -98,28 +98,28 @@ export const getTransactions = async (
   }
 };
 
-// export const deleteAccountById = async (
-//   req: Request,
-//   res: Response,
-//   next: NextFunction
-// ): Promise<void> => {
-//   try {
-//     const userId = req.user?.userId;
-//     const { id: accountId } = req.params;
+export const deleteTransactionById = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const userId = req.user?.userId;
+    const { id: transactionId } = req.params;
 
-//     if (!userId) {
-//       throw new BadRequestError(
-//         MESSAGES.ERROR.AUTHORIZATION.USER_NOT_AUTHENTICATED
-//       );
-//     }
+    if (!userId) {
+      throw new BadRequestError(
+        MESSAGES.ERROR.AUTHORIZATION.USER_NOT_AUTHENTICATED
+      );
+    }
 
-//     await accountService.softDeleteAccountById(accountId, userId);
+    await transactionService.softDeleteTransactionById(transactionId, userId);
 
-//     res.status(200).json({
-//       success: true,
-//       message: MESSAGES.SUCCESS.ACCOUNT.DELETED,
-//     });
-//   } catch (error) {
-//     next(error);
-//   }
-// };
+    res.status(200).json({
+      success: true,
+      message: MESSAGES.SUCCESS.TRANSACTION.DELETED,
+    });
+  } catch (error) {
+    next(error);
+  }
+};

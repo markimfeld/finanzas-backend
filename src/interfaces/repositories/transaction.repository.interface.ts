@@ -15,5 +15,8 @@ export interface ITransactionRepository {
     id: string,
     data: UpdateTransactionDto
   ): Promise<ITransaction | null>;
-  delete(userId: string, id: string): Promise<void>;
+  softTransactionDeleteById(
+    transactionId: string,
+    userId: string
+  ): Promise<void>;
 }
