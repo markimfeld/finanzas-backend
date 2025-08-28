@@ -306,102 +306,98 @@ describe("Transaction: update transaction.", () => {
   });
 });
 
-// describe("Account: delete account.", () => {
-//   let access_token: string;
-//   let another_access_token: string;
-//   let anAccount: IAccount | null;
-//   let anAccount2: IAccount | null;
-//   let anAccount3: IAccount | null;
-//   let user: IUser | null;
-//   let anotherUser: IUser | null;
+describe("Transaction: delete transaction.", () => {
+  let access_token: string;
+  let other_access_token: string;
+  let anAccount: IAccount | null;
+  let user: IUser | null;
+  let transaction1: ITransaction | null;
+  let transaction2: ITransaction | null;
+  let category1: ICategory | null;
 
-//   beforeEach(async () => {
-//     await UserModel.deleteMany({});
-//     await AuditLogModel.deleteMany({});
-//     await CategoryModel.deleteMany({});
-//     await BudgetModel.deleteMany({});
-//     await AccountModel.deleteMany({});
-//     access_token = await getAuthToken(
-//       "get_accounts_paginate@example.com",
-//       "StrongPass123!"
-//     );
-//     another_access_token = await getAuthToken(
-//       "another_token@example.com",
-//       "StrongPass123!"
-//     );
+  beforeEach(async () => {
+    await UserModel.deleteMany({});
+    await AuditLogModel.deleteMany({});
+    await CategoryModel.deleteMany({});
+    await BudgetModel.deleteMany({});
+    await AccountModel.deleteMany({});
+    await TransactionModel.deleteMany({});
+    access_token = await getAuthToken(
+      "delete_transaction@example.com",
+      "StrongPass123!"
+    );
+    other_access_token = await getAuthToken(
+      "other_update_account@example.com",
+      "StrongPass123!"
+    );
+    user = await getOne("delete_transaction@example.com");
 
-//     user = await getOne("get_accounts_paginate@example.com");
-//     anotherUser = await getOne("another_token@example.com");
+    anAccount = await AccountModel.create({
+      name: "Brubank",
+      type: "bank",
+      balance: 100000,
+      userId: user?._id,
+    });
 
-//     anAccount = await AccountModel.create({
-//       name: "Brubank",
-//       type: "bank",
-//       balance: 0,
-//       userId: user?._id,
-//     });
-//     anAccount2 = await AccountModel.create({
-//       name: "Galicia",
-//       type: "bank",
-//       balance: 150000,
-//       userId: user?._id,
-//     });
-//     anAccount3 = await AccountModel.create({
-//       name: "Test",
-//       type: "bank",
-//       balance: 0,
-//       userId: user?._id,
-//       isDeleted: true,
-//     });
-//   });
+    category1 = await CategoryModel.create({
+      name: "Categoriaa 1",
+      userId: user?._id,
+    });
 
-//   it("should delete an account by id.", async () => {
-//     const res = await request(app)
-//       .delete(`/api/accounts/${anAccount?._id}`)
-//       .set("Authorization", `Bearer ${access_token}`);
+    transaction1 = await TransactionModel.create({
+      userId: user?._id,
+      category: category1?._id,
+      account: anAccount?._id,
+      amount: 200,
+      type: "expense",
+      description: "test expense",
+    });
 
-//     expect(res.status).toBe(200);
-//     expect(res.body).toHaveProperty("message");
-//     expect(res.body.message).toBe(MESSAGES.SUCCESS.ACCOUNT.DELETED);
+    transaction2 = await TransactionModel.create({
+      userId: user?._id,
+      category: category1?._id,
+      account: anAccount?._id,
+      amount: 200,
+      type: "expense",
+      description: "test expense 2",
+    });
+  });
 
-//     const res2 = await request(app)
-//       .get("/api/accounts")
-//       .set("Authorization", `Bearer ${access_token}`);
+  it("Should delete a transaction", async () => {
+    const res = await request(app)
+      .delete(`/api/transactions/${transaction1?._id}`)
+      .set("Authorization", `Bearer ${access_token}`);
 
-//     expect(res2.body.data.length).toBe(1);
-//     expect(res2.body.data[0].name).toBe("Galicia");
-//   });
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(res.body.message).toBe(MESSAGES.SUCCESS.TRANSACTION.DELETED);
+  });
 
-//   it("should return 401 if access token is not provided.", async () => {
-//     const res = await request(app).delete(`/api/accounts/${anAccount?._id}`);
+  it("should return 401 if access token is not provided.", async () => {
+    const res = await request(app).delete(
+      `/api/transactions/${transaction1?._id}`
+    );
 
-//     expect(res.status).toBe(401);
-//   });
+    expect(res.status).toBe(401);
+  });
 
-//   it("should delete an user own account.", async () => {
-//     const res = await request(app)
-//       .delete(`/api/accounts/${anAccount?._id}`)
-//       .set("Authorization", `Bearer ${another_access_token}`);
+  it("should delete an user own transaction.", async () => {
+    const res = await request(app)
+      .delete(`/api/transactions/${transaction1?._id}`)
+      .set("Authorization", `Bearer ${other_access_token}`);
 
-//     expect(res.status).toBe(404);
-//   });
+    expect(res.status).toBe(404);
+  });
 
-//   it("should return 400 if the user is trying to delete an account wiht 0 balance.", async () => {
-//     const res = await request(app)
-//       .delete(`/api/accounts/${anAccount2?._id}`)
-//       .set("Authorization", `Bearer ${access_token}`);
+  it("should return 404 if the user is trying to delete an account already deleted.", async () => {
+    await request(app)
+      .delete(`/api/transactions/${transaction2?._id}`)
+      .set("Authorization", `Bearer ${access_token}`);
 
-//     expect(res.status).toBe(400);
-//     expect(res.body.errors[0].message).toBe(
-//       MESSAGES.ERROR.ACCOUNT
-//         .CANNOT_DELETE_ACCOUNT_WITH_BALANCE_GREATER_THAN_ZERO
-//     );
-//   });
+    const res = await request(app)
+      .delete(`/api/transactions/${transaction2?._id}`)
+      .set("Authorization", `Bearer ${access_token}`);
 
-//   it("should return 404 if the user is trying to delete an account already deleted.", async () => {
-//     const res = await request(app)
-//       .delete(`/api/accounts/${anAccount3?._id}`)
-//       .set("Authorization", `Bearer ${access_token}`);
-
-//     expect(res.status).toBe(404);
-//   });
-// });
+    expect(res.status).toBe(404);
+  });
+});

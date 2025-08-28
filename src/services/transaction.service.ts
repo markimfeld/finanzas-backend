@@ -49,20 +49,21 @@ export class TransactionService {
     return updatedTransaction;
   }
 
-  //   async softDeleteAccountById(accountId: string, userId: string) {
-  //     // Podés hacer una verificación previa si querés
-  //     const account = await this.accountRepo.findById(accountId);
+  async softDeleteTransactionById(transactionId: string, userId: string) {
+    const transaction =
+      await this.transactionRepository.findById(transactionId);
 
-  //     if (!account || account.userId.toString() !== userId || account.isDeleted) {
-  //       throw new NotFoundError(MESSAGES.ERROR.ACCOUNT.NOT_FOUNTD);
-  //     }
+    if (
+      !transaction ||
+      transaction.userId.toString() !== userId ||
+      transaction.isDeleted
+    ) {
+      throw new NotFoundError(MESSAGES.ERROR.TRANSACTION.NOT_FOUND);
+    }
 
-  //     if (account.balance > 0) {
-  //       throw new BadRequestError(
-  //         MESSAGES.ERROR.ACCOUNT.CANNOT_DELETE_ACCOUNT_WITH_BALANCE_GREATER_THAN_ZERO
-  //       );
-  //     }
-
-  //     await this.accountRepo.softDeleteAccountById(accountId, userId);
-  //   }
+    await this.transactionRepository.softTransactionDeleteById(
+      transactionId,
+      userId
+    );
+  }
 }
