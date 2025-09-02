@@ -1,4 +1,4 @@
-import { UpdateTransactionDto } from "@/dtos/updateTransaction.dto";
+import { UpdateTransactionDto } from "../../../dtos/updateTransaction.dto";
 import { CreateTransactionDto } from "../../../dtos/createTransaction.dto";
 import { ITransactionRepository } from "../../../interfaces/repositories/transaction.repository.interface";
 import {
@@ -53,7 +53,7 @@ export class TransactionRepositoryMongo implements ITransactionRepository {
   ): Promise<PaginatedResult<ITransaction>> {
     const skip = (page - 1) * limit;
 
-    const [accounts, total] = await Promise.all([
+    const [transactions, total] = await Promise.all([
       TransactionModel.find({ userId, isDeleted: false })
         .skip(skip)
         .limit(limit)
@@ -62,7 +62,7 @@ export class TransactionRepositoryMongo implements ITransactionRepository {
     ]);
 
     return {
-      data: accounts,
+      data: transactions,
       pagination: { total, page, limit, pages: Math.ceil(total / limit) },
     };
   }

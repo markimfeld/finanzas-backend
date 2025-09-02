@@ -1,4 +1,4 @@
-import { BadRequestError, NotFoundError } from "../errors";
+import { NotFoundError } from "../errors";
 import { MESSAGES } from "../constants/messages";
 import { CreateTransactionDto } from "../dtos/createTransaction.dto";
 import { ITransactionRepository } from "../interfaces/repositories/transaction.repository.interface";

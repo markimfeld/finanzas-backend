@@ -42,6 +42,9 @@ export const MESSAGES = {
     TRANSACTION: {
       NOT_FOUND: "Transaction not found.",
     },
+    INVESTMENT: {
+      NOT_FOUND: "Investment nof found.",
+    },
   },
   VALIDATION: {
     GENERAL: {
@@ -116,6 +119,11 @@ export const MESSAGES = {
       CREATED: "Transaction created successfully.",
       UPDATED: "Transaction updated successfully.",
       DELETED: "Transaction deleted successfully.",
+    },
+    INVESTMENT: {
+      CREATED: "Investment created successfully.",
+      UPDATED: "Investment updated successfully.",
+      DELETED: "Investment deleted successfully.",
     },
   },
 };
