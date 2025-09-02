@@ -10,6 +10,8 @@ import { AccountService } from "./account.service";
 import { AccountRepositoryMongo } from "../repositories/implementations/mongodb/account.repository.mongo";
 import { TransactionRepositoryMongo } from "../repositories/implementations/mongodb/transaction.repository.mongo";
 import { TransactionService } from "./transaction.service";
+import { InvestmentRepositoryMongo } from "../repositories/implementations/mongodb/investment.repository.mongo";
+import { InvestmentService } from "./investment.service";
 
 const userRepository = new UserRepositoryMongo();
 export const userService = new UserService(userRepository);
@@ -31,3 +33,6 @@ export const accountService = new AccountService(accountRepository);
 
 const transactionRepository = new TransactionRepositoryMongo();
 export const transactionService = new TransactionService(transactionRepository);
+
+const investmentRepository = new InvestmentRepositoryMongo();
+export const investmentService = new InvestmentService(investmentRepository);
