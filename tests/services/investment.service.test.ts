@@ -47,6 +47,7 @@ describe("Investment: create investment", () => {
     await BudgetModel.deleteMany({});
     await AccountModel.deleteMany({});
     await TransactionModel.deleteMany({});
+    await InvestmentModel.deleteMany({});
     access_token = await getAuthToken(
       "investment@example.com",
       "StrongPass123!"
@@ -103,6 +104,7 @@ describe("Investment: get investments.", () => {
     await BudgetModel.deleteMany({});
     await AccountModel.deleteMany({});
     await TransactionModel.deleteMany({});
+    await InvestmentModel.deleteMany({});
 
     access_token = await getAuthToken(
       "get_investments@example.com",
