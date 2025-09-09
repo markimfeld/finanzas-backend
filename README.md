@@ -88,3 +88,21 @@
 - [x] Actualizar transación.
 - [x] Lista transacciones.
 - [x] Eliminar transación.
+
+# 🧾 Módulo: Inversiones (investments)
+
+## ✅ Funcionalidades básicas
+
+- [x] Crear investment.
+- [x] Actualizar investment.
+- [x] Lista investments.
+- [x] Eliminar investment.
+
+# 🧾 Módulo: Transacciones de inversión (investment transactions)
+
+## ✅ Funcionalidades básicas
+
+- [x] Crear investment transaction.
+- [x] Actualizar investment. transaction.
+- [x] Lista investment transactions.
+- [x] Eliminar investment transaction.
