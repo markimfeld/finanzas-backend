@@ -25,7 +25,7 @@ router.post(
   authorize("investments.create"),
   validateZod(createInvestmentSchema),
   checkUserIsActive,
-  auditMiddleware("create_investments"),
+  auditMiddleware("create_investment"),
   createInvestment
 );
 router.put(
@@ -34,7 +34,7 @@ router.put(
   authorize("investments.update"),
   validateZod(updateInvestmentSchema, "body"),
   checkUserIsActive,
-  auditMiddleware("update_transaction"),
+  auditMiddleware("update_investment"),
   updateInvestment
 );
 router.get(
@@ -51,7 +51,7 @@ router.delete(
   authMiddleware,
   authorize("investments.delete"),
   checkUserIsActive,
-  auditMiddleware("delete_investments"),
+  auditMiddleware("delete_investment"),
   deleteInvestmentById
 );
 

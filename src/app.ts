@@ -10,6 +10,7 @@ import categoryRoutes from "./routes/category.routes";
 import accountRoutes from "./routes/account.routes";
 import transactionRoutes from "./routes/transaction.routes";
 import investmentRoutes from "./routes/investment.routes";
+import investmentTransactionRoutes from "./routes/investmentTransaction.routes";
 
 // middleware
 import { errorHandler } from "./middlewares/error.middleware";
@@ -30,6 +31,7 @@ app.use("/api/categories", categoryRoutes);
 app.use("/api/accounts", accountRoutes);
 app.use("/api/transactions", transactionRoutes);
 app.use("/api/investments", investmentRoutes);
+app.use("/api/investmentTransactions", investmentTransactionRoutes);
 
 // Manejo de rutas no encontradas (404)
 app.use(notFoundHandler);
