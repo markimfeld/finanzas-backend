@@ -11,6 +11,7 @@ export interface IInvestmentTransactionRepository {
   findById(
     investmentTransactionId: string
   ): Promise<IInvestmentTransaction | null>;
+  findByInvestment(investmentId: string): Promise<IInvestmentTransaction[]>;
   findByUserPaginated(
     userId: string,
     page: number,

@@ -5,17 +5,21 @@ import { IInvestmentTransactionRepository } from "../interfaces/repositories/inv
 import { IInvestmentTransaction } from "../models/investmentTransaction.model";
 import { PaginatedResult } from "../dtos/paginatedResult.dto";
 import { UpdateInvestmentTransactionDto } from "../dtos/updateInvestmentTransaction.dto";
+import { InvestmentService } from "./investment.service";
 
 export class InvestmentTransactionService {
   constructor(
-    private readonly investmentTransactionRepository: IInvestmentTransactionRepository
+    private readonly investmentTransactionRepository: IInvestmentTransactionRepository,
+    private readonly investmentService: InvestmentService
   ) {}
 
   async createInvestmentTransaction(
     dto: CreateInvestmentTransactionDto,
     userId: string
   ) {
-    return this.investmentTransactionRepository.create(userId, dto);
+    const tx = await this.investmentTransactionRepository.create(userId, dto);
+    await this.investmentService.recalculateInvestment(dto.investmentId);
+    return tx;
   }
 
   async getInvestmentTransactionById(

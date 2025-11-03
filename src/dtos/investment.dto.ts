@@ -14,6 +14,12 @@ export class InvestmentDTO {
   userId: Schema.Types.ObjectId;
   description?: string;
   isDeleted: Boolean;
+  totalQuantity: number;
+  avgPriceUnderlyingUSD?: number;
+  avgPriceCedearUSD?: number;
+  currentValue: number;
+  pnl: number;
+  pnlPct: number;
 
   constructor(investment: IInvestment & { _id: any }) {
     this.id = investment._id.toString(); // Aseguramos que sea string
@@ -24,6 +30,12 @@ export class InvestmentDTO {
     this.ratio = investment.ratio;
     this.fxRateSource = investment.fxRateSource;
     this.isDeleted = investment.isDeleted;
+    this.totalQuantity = investment.totalQuantity;
+    this.avgPriceUnderlyingUSD = investment.avgPriceUnderlyingUSD;
+    this.avgPriceCedearUSD = investment.avgPriceCedearUSD;
+    this.currentValue = investment.currentValue;
+    this.pnl = investment.pnl;
+    this.pnlPct = investment.pnlPct;
   }
 
   static fromMany(

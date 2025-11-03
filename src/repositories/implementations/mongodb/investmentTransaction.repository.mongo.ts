@@ -57,6 +57,14 @@ export class InvestmentTransactionRepositoryMongo
     ).lean<IInvestmentTransaction>(); // Usás .lean() para devolver POJO
   }
 
+  async findByInvestment(
+    investmentId: string
+  ): Promise<IInvestmentTransaction[]> {
+    return await InvestmentTransactionModel.find({
+      investmentId: investmentId,
+    });
+  }
+
   async findByUserPaginated(
     userId: string,
     page: number,

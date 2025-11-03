@@ -3,7 +3,7 @@ import { objectIdValidator } from "./objectId.schema";
 
 export const updateInvestmentTransactionSchema = z.object({
   investmentId: objectIdValidator.optional(),
-  type: z.enum(["buy", "sell", "interest", "maturity"]).optional(),
+  type: z.enum(["buy", "sell", "interest", "maturity", "initial"]).optional(),
   currency: z.enum(["USD", "ARS", "USDT"]).optional(),
   operationDate: z
     .string()
@@ -12,4 +12,7 @@ export const updateInvestmentTransactionSchema = z.object({
   quantity: z.number().min(0).optional(),
   price: z.number().min(0).optional(),
   amount: z.number().min(0).optional(),
+  cclAtTrade: z.number().min(0).optional(),
+  pnl: z.number().min(0).optional(),
+  pnlPct: z.number().min(0).optional(),
 });

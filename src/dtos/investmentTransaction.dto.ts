@@ -10,12 +10,16 @@ export class InvestmentTransactionDTO {
   userId: Schema.Types.ObjectId;
   investmentId: Schema.Types.ObjectId;
   operationDate: Date;
-  type: "buy" | "sell" | "interest" | "maturity";
+  type: "buy" | "sell" | "interest" | "maturity" | "initial";
   quantity: number;
   price: number;
   amount: number;
+  cclAtTrade?: number;
   currency: "USD" | "ARS" | "USDT";
   isDeleted: Boolean;
+  avgPrice: number;
+  pnl: number;
+  pnlPct: number;
 
   constructor(investmentTransaction: IInvestmentTransaction & { _id: any }) {
     this.id = investmentTransaction._id.toString(); // Aseguramos que sea string
@@ -26,8 +30,12 @@ export class InvestmentTransactionDTO {
     this.quantity = investmentTransaction.quantity;
     this.price = investmentTransaction.price;
     this.amount = investmentTransaction.amount;
+    this.cclAtTrade = investmentTransaction.cclAtTrade;
     this.currency = investmentTransaction.currency;
     this.isDeleted = investmentTransaction.isDeleted;
+    this.avgPrice = investmentTransaction.avgPrice;
+    this.pnl = investmentTransaction.pnl;
+    this.pnlPct = investmentTransaction.pnlPct;
   }
 
   static fromMany(

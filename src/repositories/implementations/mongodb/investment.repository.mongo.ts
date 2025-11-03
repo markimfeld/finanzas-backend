@@ -22,6 +22,11 @@ export class InvestmentRepositoryMongo implements IInvestmentRepository {
       ratio,
       symbol,
       isDeleted,
+      avgPrice,
+      pnl,
+      pnlPct,
+      currentValue,
+      totalQuantity,
       createdAt,
       updatedAt,
     } = investment.toObject();
@@ -35,6 +40,11 @@ export class InvestmentRepositoryMongo implements IInvestmentRepository {
       ratio,
       symbol,
       isDeleted,
+      avgPrice,
+      pnl,
+      pnlPct,
+      currentValue,
+      totalQuantity,
       createdAt,
       updatedAt,
     };
